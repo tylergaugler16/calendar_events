@@ -1,0 +1,14 @@
+body{
+  background-color: blue;
+}
+.mainContainer{
+  width:90%;
+  margin:25px auto;
+}
+.addEvent{
+  margin: 25px;
+}
+form input{
+  display: block;
+  margin: 10px 0;
+}
