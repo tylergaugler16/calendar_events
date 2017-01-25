@@ -2,11 +2,10 @@ $(document).ready(function() {
 
 
   city = $('[name="city"]').val() || 'new york';
-
   //ajax call to get weather of next 15 days
   // store the result in global array weatherDates[]
   $.ajax({
-    url: 'http://api.openweathermap.org/data/2.5/forecast/daily',
+    url: '//api.openweathermap.org/data/2.5/forecast/daily',
     data: {
       APPID: 'beaace900c34ef2575c7c9a2fa4f8785',
       q: city,
