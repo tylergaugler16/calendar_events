@@ -1,5 +1,5 @@
 body{
-  background-color: blue;
+  /*background-color: blue;*/
 }
 .mainContainer{
   width:90%;
@@ -11,4 +11,14 @@ body{
 form input{
   display: block;
   margin: 10px 0;
+}
+
+#modal-container{
+  overflow: scroll;
+}
+#modalDate{
+  float:right;
+}
+.modalContent h1{
+  margin-top:0;
 }

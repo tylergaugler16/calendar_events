@@ -34,6 +34,47 @@ app.get("/event/:id", function(req, res){
   });
 });
 
+app.get("/login", function(req, res){
+  res.render('login');
+});
+
+app.post("/login", function(req, res){
+  query(`select * from users where username =$1 and password =$2`,['${req.body.username}', '${req.body.password}'], function(err, result){
+    if(err){
+      res.send(err);
+    }
+    else{
+      res.send("found user!");
+    }
+  });
+});
+
+app.get('/events', function(req, res){
+  query(`select * from events`, function(err, result){
+    if(err){
+      res.send(err);
+    }
+    else{
+      res.send({events: result.rows});
+    }
+  });
+});
+app.get('/events/:start', function(req, res){
+  var start = req.params.start;
+  console.log(start);
+  query(`select * from events where start_date='${req.params.start}' `,function(err, result){
+    if(err){
+      console.log("error finding the user");
+      res.send(err);
+    }
+      else{
+        res.send({events: result.rows});
+    }
+
+  });
+
+
+});
 
 app.listen(3000,function(){
   console.log("listening on port 3000");
