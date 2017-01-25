@@ -1,6 +1,13 @@
 body{
   /*background-color: blue;*/
 }
+a{
+  text-decoration: none;
+  color:white;
+}
+a:visited{
+  color:white;
+}
 .mainContainer{
   width:90%;
   margin:25px auto;
@@ -21,4 +28,34 @@ form input{
 }
 .modalContent h1{
   margin-top:0;
+}
+thead td{
+  background-color: #4C688B;
+}
+tbody td{
+  background-color: #748BA7;
+}
+.fc-unthemed td.fc-today{
+  background-color: #4C688B;
+}
+span.fc-title{
+  color:white;
+}
+a.fc-event{
+  background-color: #143054;
+  padding:2px;
+
+}
+#addEventModal{
+  margin: 10px auto;
+  background-color: #4C688B;
+  width: 180px;
+  padding: 6px;
+  border-radius: 2px;
+  text-align: center;
+}
+
+/*event page*/
+#deleteEvent{
+  color:red;
 }

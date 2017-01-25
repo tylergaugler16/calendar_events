@@ -9,8 +9,12 @@
 </head>
 <body>
   <div class="mainContainer">
+
+
     <h1><%= event.title %></h1>
     <p><%= event.description %> </p>
+
+    <a href="/events/delete/<%=event.id%>" id="deleteEvent">Delete Event</a>
   </div>
 </body>
 </html>

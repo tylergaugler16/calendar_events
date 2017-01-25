@@ -72,8 +72,13 @@ app.get('/events/:start', function(req, res){
     }
 
   });
+});
 
-
+app.get('/events/delete/:id', function(req, res){
+  query(`delete from events where id=$1`,[req.params.id], function(err,result){
+    if(err) console.log(err);
+    res.redirect("/");
+  });
 });
 
 app.listen(process.env.PORT || 3000,function(){

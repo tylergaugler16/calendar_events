@@ -1,8 +1,5 @@
 $(document).ready(function() {
 
-
-
-  city = $('[name="city"]').val() || 'new york';
   //ajax call to get weather of next 15 days
   // store the result in global array weatherDates[]
   $.ajax({
@@ -11,32 +8,24 @@ $(document).ready(function() {
     url: 'https://api.wunderground.com/api/da29124d0e38bc6b/forecast10day/q/NY/New_York.json',
 
     success: function(result){
-      console.log(result.forecast.simpleforecast.forecastday.length);
-      // console.log(result.forecast.simpleforecast.forecastday);
-      weatherDates = result.forecast.simpleforecast.forecastday;
-      console.log("TYLER");
-      console.log(weatherDates);
-      // console.log(result.list[0]);
-      // $('.fc-today').append(result.list[0].rain);
-      var day = $('#calendar').fullCalendar('getDate');
-      for(var i= 0;i < result.forecast.simpleforecast.forecastday.length;i++){
-        m = day._d.getMonth()+1;
-        if(m < 10) m = "0"+m;
-        d = day._d.getDate();
-        if(d<10) d = "0"+d;
-        var dateString = +day._d.getUTCFullYear() +"-"+m+"-"+d;
-        // adds date to the returned object
-        result.forecast.simpleforecast.forecastday[i].date = dateString;
-        // $('[data-date="'+dateString+'"]').append("yeet");
-        // $('.fc-today').append(result.list[i].rain);
-        $('#calendar').fullCalendar( 'incrementDate', {days: 1} );
-        day = $('#calendar').fullCalendar('getDate');
+        weatherDates = result.forecast.simpleforecast.forecastday;
+        var day = $('#calendar').fullCalendar('getDate'); //returns current date
 
+        for(var i= 0;i < result.forecast.simpleforecast.forecastday.length;i++){
+          m = day._d.getMonth()+1;
+          if(m < 10) m = "0"+m;
+          d = day._d.getDate();
+          if(d<10) d = "0"+d;
+          var dateString = +day._d.getUTCFullYear() +"-"+m+"-"+d;
+
+          result.forecast.simpleforecast.forecastday[i].date = dateString; // adds date to the returned object
+          $('#calendar').fullCalendar( 'incrementDate', {days: 1} ); // increments date and then gets value
+          day = $('#calendar').fullCalendar('getDate');
+
+        }
+        //returns day back to current day
+        $('#calendar').fullCalendar('today');
       }
-      //returns day back to current day
-      $('#calendar').fullCalendar('today');
-
-    }
   });
 
 
@@ -86,37 +75,41 @@ $(document).ready(function() {
               url: '/events/'+date.format(),
               success: function(response){
                 if(response.events.length > 0){
-                  console.log("yeet");
-                  var title= response.events[0].title;
-                  var description = response.events[0].description;
-                  Modal.open({
-                      content: '<h1>'+title+ '</h1><p>'+description+'</p>'+'<h3>High:</h3><span>'+weatherInfo.max_temp+'F</span><h3>Low:</h3><span>'+weatherInfo.min_temp+'F</span><h3><p>'+weatherInfo.description+'</p><h3 id="modalDate">'+weatherInfo.date+'</h3><img src="'+weatherInfo.icon_url+'"">',
-                      width: '50%', // Can be set to px, em, %, or whatever else is out there.
-                      height: '60%',
-                      hideclose: true, // Hides the close-modal graphic
-                      // closeAfter: 10
-                    });
+                    var title= response.events[0].title;
+                    var description = response.events[0].description;
+                    Modal.open({
+                        content: '<h1>'+title+ '</h1><p>'+description+'</p>'+'<h3>High:</h3><span>'+weatherInfo.max_temp+'F</span><h3>Low:</h3><span>'+weatherInfo.min_temp+'F</span><h3><p>'+weatherInfo.description+'</p><h3 id="modalDate">'+weatherInfo.date+'</h3><img src="'+weatherInfo.icon_url+'"">',
+                        width: '50%',
+                        height: '60%',
+                        hideclose: true
+                      });
                 }
                 // if there is no event for that day, just dipslay the weather for that day if possible
                 else{
-                  Modal.open({
-                      content: '<h1>No Event Scheduled for This Date</h1>'+'<h3>High:</h3><span>'+weatherInfo.max_temp+'F</span><h3>Low:</h3><span>'+weatherInfo.min_temp+'F</span><p>'+weatherInfo.description+'</p><h3 id="modalDate">'+weatherInfo.date+'</h3><img src="'+weatherInfo.icon_url+'"">',
-                      width: '50%', // Can be set to px, em, %, or whatever else is out there.
-                      height: '60%',
-                      hideclose: true, // Hides the close-modal graphic
-                      // closeAfter: 10
-                    });
-
-                }
+                    Modal.open({
+                        content: '<h1>No Event Scheduled for This Date</h1>'+'<h3>High:</h3><span>'+weatherInfo.max_temp+'F</span><h3>Low:</h3><span>'+weatherInfo.min_temp+'F</span><p>'+weatherInfo.description+'</p><h3 id="modalDate">'+weatherInfo.date+'</h3><img src="'+weatherInfo.icon_url+'""><a href="#"><div id="addEventModal">Add an Event to this day</div></a>',
+                        width: '50%',
+                        height: '60%',
+                        hideclose: true,
+                        openCallback: function(){
+                                  $('#addEventModal').click(function(){
+                                    $('#modal-overlay').css("visibility","hidden");
+                                    $('#modal-container').css("visibility","hidden");
+                                    $('html, body').animate({
+                                      scrollTop: $("#addEventButton").offset().top
+                                    }, 2000);
+                                  });
+                        }
+                        // closeAfter: 10
+                      });
+                  }
               }
 
             });
-            // alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
 
-            // alert('Current view: ' + view.name);
       }
     });
-    // check if this day has an event before
+
 
 
 
@@ -173,6 +166,9 @@ $('#addEventButton').click(function(e){
           url: "/event/"+response.event.last_id,
           id: response.event.last_id
         }], true);
+        $('html, body').animate({
+          scrollTop: $("#calendar").offset().top
+        }, 2000);
     }
   });
 });
@@ -180,14 +176,6 @@ $('#addEventButton').click(function(e){
 
 
 
-      $('#modal').click(function(){
-        Modal.open({
-            content: 'd',
-            width: '50%', // Can be set to px, em, %, or whatever else is out there.
-            height: '60%',
-            hideclose: true, // Hides the close-modal graphic
-            // closeAfter: 10
-          });
-      });
+
 
 });
