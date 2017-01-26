@@ -111,8 +111,6 @@ $(document).ready(function() {
     });
 
 
-
-
 // adds events to calendar from db
     $.ajax({
       url: '/events',
@@ -131,13 +129,6 @@ $(document).ready(function() {
       }
     });
 
-    // $('#my-button').click(function() {
-    //     var moment = $('#calendar').fullCalendar('getDate');
-    //     alert("The current date of the calendar is " + moment.format());
-    //
-    //     $('#calendar').fullCalendar( 'incrementDate', {days: 1} );
-    // });
-    // use this to increment the calnder
 
 // do this for all events in the db
 
@@ -169,6 +160,9 @@ $('#addEventButton').click(function(e){
         $('html, body').animate({
           scrollTop: $("#calendar").offset().top
         }, 2000);
+        $('[name="title"]').val('');
+        $('[name="start"]').val('');
+        $('[name="description"]').val('');
     }
   });
 });
