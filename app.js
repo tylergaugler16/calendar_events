@@ -1,6 +1,7 @@
-var express = require('express');
-var bodyParser = require('body-parser');
+var express     = require('express');
+var bodyParser  = require('body-parser');
 var query       = require('./query');
+var bcrypt      = require('bcrypt');
 
 var connectionString = process.env.DATABASE_URL || 'postgres://' + process.env.POSTGRES_USER + ':' + process.env.POSTGRES_PASSWORD + '@localhost/calendar' ;
 
@@ -39,14 +40,21 @@ app.get("/login", function(req, res){
 });
 
 app.post("/login", function(req, res){
-  query(`select * from users where username =$1 and password =$2`,['${req.body.username}', '${req.body.password}'], function(err, result){
+  bcrypt.hash(req.body.password, 10, function(){
     if(err){
-      res.send(err);
+      res.redirect('/login');
     }
-    else{
-      res.send("found user!");
-    }
+    query(`select * from users where username =$1 and password =$2`,['${req.body.username}', '${req.body.password}'], function(err, result){
+      if(err){
+        res.send(err);
+      }
+      else{
+        res.send("found user!");
+      }
+    });
+
   });
+
 });
 
 app.get('/events', function(req, res){
