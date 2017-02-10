@@ -134,6 +134,8 @@ $(document).ready(function() {
 
 $('#addEventButton').click(function(e){
   console.log("i'm ading an event");
+
+
   e.preventDefault();
   var title = $('[name="title"]').val();
   var desc  = $('[name="description"]').val();

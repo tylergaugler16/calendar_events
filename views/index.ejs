@@ -13,6 +13,9 @@
   <title>Document</title>
 </head>
 <body>
+  <% if(user){ %>
+    <h1><%= user.username %></h1>
+  <% } %>
 
   <div class="mainContainer">
     <div id="calendar">
