@@ -73,6 +73,7 @@ $(document).ready(function() {
             // then opens modal with event info
             $.ajax({
               url: '/events/'+date.format(),
+              user_id: $('[name="id"]').val(),
               success: function(response){
                 if(response.events.length > 0){
                     var title= response.events[0].title;
@@ -100,7 +101,6 @@ $(document).ready(function() {
                                     }, 2000);
                                   });
                         }
-                        // closeAfter: 10
                       });
                   }
               }
@@ -114,6 +114,7 @@ $(document).ready(function() {
 // adds events to calendar from db
     $.ajax({
       url: '/events',
+
       data: {
 
       },
@@ -135,11 +136,11 @@ $(document).ready(function() {
 $('#addEventButton').click(function(e){
   console.log("i'm ading an event");
 
-
   e.preventDefault();
   var title = $('[name="title"]').val();
   var desc  = $('[name="description"]').val();
   var start = $('[name="start"]').val();
+  var id    = $('[name="id"]').val();
   $.ajax({
     url: '/addEvent',
     type: 'POST',
@@ -147,6 +148,7 @@ $('#addEventButton').click(function(e){
       title: title,
       description: desc,
       start: start,
+      user_id: id
     },
     success: function(response){
 
@@ -168,8 +170,6 @@ $('#addEventButton').click(function(e){
     }
   });
 });
-
-
 
 
 

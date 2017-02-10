@@ -96,13 +96,12 @@ function isLoggedIn(req, res, next) {
 
 
 app.get("/", isLoggedIn, function(req, res){
-  console.log(req.user);
-
   res.render('index', {user: req.user});
 });
 
+
 app.post("/addEvent", function(req, res){
-    query(`insert into events(title, description, start_date) values('${req.body.title.replace("'","''")}', '${req.body.description.replace("'","''")}', '${req.body.start}') returning id as last_id`, function(err, result){
+    query(`insert into events(title, description, start_date, user_id) values('${req.body.title.replace("'","''")}', '${req.body.description.replace("'","''")}', '${req.body.start}', ${req.body.user_id} ) returning id as last_id`, function(err, result){
         if(err){
           console.log(err);
         }
@@ -160,8 +159,10 @@ app.get('/auth/facebook/callback',
     res.redirect('/');
   });
 
+
+
 app.get('/events', function(req, res){
-  query(`select * from events`, function(err, result){
+  query(`select * from events where user_id='${req.user.id}'`, function(err, result){
     if(err){
       res.send(err);
     }
@@ -171,6 +172,7 @@ app.get('/events', function(req, res){
   });
 });
 app.get('/events/:start', function(req, res){
+
   var start = req.params.start;
   query(`select * from events where start_date='${req.params.start}' `,function(err, result){
     if(err){
