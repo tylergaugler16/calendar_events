@@ -8,7 +8,12 @@ var passport    = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 var config = require('./oauth');
 
+var env = process.env.NODE_ENV || 'dev';
 var connectionString = process.env.DATABASE_URL || 'postgres://' + process.env.POSTGRES_USER + ':' + process.env.POSTGRES_PASSWORD + '@localhost/calendar' ;
+var callback_url = 'http://localhost:3000/auth/facebook/callback';
+if(env == 'production'){
+  callback_url = 'https://weatherevent-calendar.herokuapp.com/auth/facebook/callback';
+}
 
 var app = express();
 
@@ -25,7 +30,7 @@ app.use(session({
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: true,
-  cookie: { } // set secure: true for https
+  cookie: { secure: (env == 'production')} // set secure to true if in production. for https
 }));
 
 app.use(passport.initialize());
@@ -51,11 +56,11 @@ passport.deserializeUser(function(id, done) {
 
 
 
+
 passport.use(new FacebookStrategy({
     clientID: '270076200092678',
     clientSecret: '651dbeef72caf9f1dac8689bef645cad',
-    // callbackURL: 'http://localhost:3000/auth/facebook/callback',
-    callbackURL: 'https://weatherevent-calendar.herokuapp.com/auth/facebook/callback',
+    callbackURL: callback_url,
     auth_type: "reauthenticate"
     // profileFields: ['id', 'displayName', 'link', 'about_me', 'photos', 'emails']
   },
