@@ -13,6 +13,9 @@
   <title>Document</title>
 </head>
 <body>
+  <% if(user){ %>
+    <h1><%= user.username %></h1>
+  <% } %>
 
   <div class="mainContainer">
     <div id="calendar">
@@ -24,6 +27,7 @@
         <input type="text" name="title" value="">
         <input type="text" name="start" value="">
         <textarea name="description" rows="4" cols="80"></textarea>
+        <input type="hidden" name="id" value="<%= user.id %>">
         <input type="submit" name="" value="Create Event" id="addEventButton">
       </form>
     </div>
