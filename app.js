@@ -55,7 +55,7 @@ passport.use(new FacebookStrategy({
     clientID: '270076200092678',
     clientSecret: '651dbeef72caf9f1dac8689bef645cad',
     // callbackURL: 'http://localhost:3000/auth/facebook/callback',
-    callbackURL: 'https://weatherevent-calendar.herokuapp.com/auth/facebook/callback'
+    callbackURL: 'https://weatherevent-calendar.herokuapp.com/auth/facebook/callback',
     auth_type: "reauthenticate"
     // profileFields: ['id', 'displayName', 'link', 'about_me', 'photos', 'emails']
   },
