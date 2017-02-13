@@ -37,7 +37,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function(user, done) {
-  // console.log("serializing"+user.displayName );
+  console.log("serializing"+user.displayName );
   done(null, user.id);
 });
 
@@ -61,7 +61,6 @@ passport.use(new FacebookStrategy({
     clientID: config.facebook.clientID,
     clientSecret: config.facebook.clientSecret,
     callbackURL: callback_url,
-    auth_type: "reauthenticate"
     // profileFields: ['id', 'displayName', 'link', 'about_me', 'photos', 'emails']
   },
   function(accessToken, refreshToken, profile, cb) {
@@ -102,12 +101,29 @@ function isLoggedIn(req, res, next) {
 
 
 app.get("/", isLoggedIn, function(req, res){
-  res.render('index', {user: req.user});
+  var user_calendars = {};
+  calendars = [];
+  user_calendars.calendars = calendars;
+  query(`select * from calendars where user_id=${req.user.id}`, function(err, result){
+    if(result.rowCount > 0){
+      res.render('index', {user: req.user, calendars: result.rows});
+      // for(var i=0;i<result.rows.length;i++){
+      //   user_calendars.calendars[i] = {
+      //     name: result.rows[i].name,
+      //     id: result.rows[i].id
+      //     };
+      //   }
+
+      }
+
+
+    });
+
 });
 
 
 app.post("/addEvent", function(req, res){
-    query(`insert into events(title, description, start_date, user_id) values('${req.body.title.replace("'","''")}', '${req.body.description.replace("'","''")}', '${req.body.start}', ${req.body.user_id} ) returning id as last_id`, function(err, result){
+    query(`insert into events(title, description, start_date, calendar_id) values('${req.body.title.replace("'","''")}', '${req.body.description.replace("'","''")}', '${req.body.start}', ${req.body.calendar_id} ) returning id as last_id`, function(err, result){
         if(err){
           console.log(err);
         }
@@ -152,12 +168,15 @@ app.get('/logout', function (req, res){
   res.redirect('/');
 });
 
-app.get('/auth/facebook', passport.authenticate('facebook', {authType: 'reauthenticate'}),function(req, res){
+app.get('/auth/facebook', passport.authenticate('facebook'),function(req, res){
+  console.log("/AUTH/FACEBOOK");
+});
+app.get('/auth/facebook/new', passport.authenticate('facebook', {authType: 'reauthenticate'}),function(req, res){
   console.log("/AUTH/FACEBOOK");
 });
 
 app.get('/auth/facebook/callback',
-  passport.authenticate('facebook', {authType: 'reauthenticate', failureRedirect: '/login'}),
+  passport.authenticate('facebook', { failureRedirect: '/login'}),
   function(req, res) {
     console.log("CALLBACK");
     console.log(req.user.displayName);
@@ -168,7 +187,7 @@ app.get('/auth/facebook/callback',
 
 
 app.get('/events', function(req, res){
-  query(`select * from events where user_id='${req.user.id}'`, function(err, result){
+  query(`select * from events where calendar_id='${req.query.calendar_id}'`, function(err, result){
     if(err){
       res.send(err);
     }
@@ -198,6 +217,7 @@ app.get('/events/delete/:id', function(req, res){
     res.redirect("/");
   });
 });
+
 
 app.listen(process.env.PORT || 3000,function(){
   console.log("listening on port 3000");

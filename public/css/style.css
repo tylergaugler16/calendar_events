@@ -3,10 +3,13 @@ body{
 }
 a{
   text-decoration: none;
-  color:white;
+  color:black;
 }
 a:visited{
-  color:white;
+  color:black;
+}
+.active{
+  color:green;
 }
 .mainContainer{
   width:90%;
