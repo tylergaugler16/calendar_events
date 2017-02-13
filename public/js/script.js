@@ -171,6 +171,28 @@ $('#addEventButton').click(function(e){
   });
 });
 
+$('#addCalendarButton').click(function(e){
+  console.log("i'm ading a calendar");
+
+  e.preventDefault();
+  var name = $('[name="name"]').val();
+  var user_id  = $('[name="user_id"]').val();
+  $.ajax({
+    url: '/calendar/add',
+    type: 'POST',
+    data: {
+      name: name,
+      user_id: user_id
+    },
+    success: function(response){
+      console.log("added calendar");
+        $('[name="name"]').val('');
+        $('[name="user_id"]').val('');
+        $('#userCalendarList').append('<li><a href="#" class="calendar_options" id="'+response.user_id+'">'+ name +'</a></li>');
+    }
+  });
+});
+
 
 $('.calendar_options').click(function(e){
   e.preventDefault();

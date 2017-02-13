@@ -219,6 +219,18 @@ app.get('/events/delete/:id', function(req, res){
 });
 
 
+app.post('/calendar/add', function(req, res){
+  query(`insert into calendars(name, user_id) values('${req.body.name.replace("'","''")}',${req.body.user_id} ) returning id as last_id`, function(err, result){
+      if(err){
+        console.log(err);
+      }
+      else{
+        res.send({user_id: result.rows[0].last_id});
+      }
+  });
+
+});
+
 app.listen(process.env.PORT || 3000,function(){
   console.log("listening on port 3000");
 });

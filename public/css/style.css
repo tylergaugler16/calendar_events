@@ -1,5 +1,8 @@
-body{
-  /*background-color: blue;*/
+html, body {
+    width:100%;
+    height:100%;
+    margin:0;
+    padding:0;
 }
 a{
   text-decoration: none;
@@ -11,9 +14,57 @@ a:visited{
 .active{
   color:green;
 }
+#userInfo{
+  width:100%;
+  height:40px;
+  position: absolute;
+  top:0;
+  right:0;
+  left:0;
+  margin:0;
+  margin-bottom: 5px;
+  background-color: #4C688B;
+}
+#userInfo h1{
+  display: inline-block;
+  margin-top:2px;
+  margin-left:10px;
+  color: white;
+}
+#userInfo a{
+  float:right;
+  margin-top: 5px;
+  margin-right:10px;
+  color:white;
+}
+#userContainer{
+  height:30px;
+  margin-bottom:10px;
+}
+#userCalenders{
+  display:inline-block;
+  width:21%;
+  margin:0;
+  margin-top: 40px;
+  background-color: #4c738b;
+  float:left;
+  padding-left: 10px;
+
+}
+
+.fullWidthContainer{
+  width:100%;
+  margin:0;
+}
 .mainContainer{
-  width:90%;
-  margin:25px auto;
+  display:inline-block;
+  width:77%;
+  margin:0;
+  margin-top:40px;
+  float:left;
+  padding-right:10px;
+  padding-top: 25px;
+  background-color: blue;
 }
 .addEvent{
   margin: 25px;
