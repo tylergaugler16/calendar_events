@@ -37,12 +37,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function(user, done) {
-  console.log("serializing"+user.displayName );
   done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-  console.log("trying to deserialize "+id);
   query(`select * from users where facebook_id='${id}'`, function(err, result){
     if(result.rowCount === 0){
       console.log("could not find user with given id");
@@ -115,6 +113,7 @@ app.get("/", isLoggedIn, function(req, res){
       //   }
 
       }
+      else res.render('index', {user: req.user, calendar: []});
 
 
     });
@@ -187,14 +186,22 @@ app.get('/auth/facebook/callback',
 
 
 app.get('/events', function(req, res){
-  query(`select * from events where calendar_id='${req.query.calendar_id}'`, function(err, result){
+  // get all events associated with calendar
+  query(`select * from events where calendar_id in (select id from calendars where name='${req.query.name}' and password='${req.query.password}')`, function(err, events){
     if(err){
       res.send(err);
     }
     else{
-      res.send({events: result.rows});
+      query(`select * from users where id in (select user_id from calendars where password='${req.query.password}' and name ='${req.query.name}') `, function(err, result){
+        if(err){console.log(err);}
+        else{
+          res.send({events: events.rows, users: result.rows});
+        }
+      });
     }
   });
+  // get all user_ids assocaited with calendar
+
 });
 app.get('/events/:start', function(req, res){
 
@@ -220,7 +227,7 @@ app.get('/events/delete/:id', function(req, res){
 
 
 app.post('/calendar/add', function(req, res){
-  query(`insert into calendars(name, user_id) values('${req.body.name.replace("'","''")}',${req.body.user_id} ) returning id as last_id`, function(err, result){
+  query(`insert into calendars(name, user_id,password) values('${req.body.name.replace("'","''")}',${req.body.user_id}, '${req.body.password}' ) returning id as last_id`, function(err, result){
       if(err){
         console.log(err);
       }

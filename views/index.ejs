@@ -26,15 +26,20 @@
     <h1>Calendars</h1>
     <ul id="userCalendarList">
     <% for(var i=0;i<calendars.length;i++){ %>
-      <li><a href="#" class="calendar_options" id="<%= calendars[i].id%>"><%= calendars[i].name %></a></li>
+      <li><a href="#" class="calendar_options <%=(i==0)? 'active' :''%> "    id="<%= calendars[i].id%>" identifier="<%=calendars[i].password %>"><%= calendars[i].name %></a></li>
     <% } %>
     </ul>
     <form action="" method="post">
       <input type="text" name="name" value="">
+      <input type="password" name="password" value="">
       <input type="hidden" name="user_id" value="<%= user.id %>">
       <input type="submit" value="Create Calendar" id="addCalendarButton">
     </form>
+    <div id="calendarUsers">
+      <ul></ul>
+    </div>
   </div>
+
     <div class="mainContainer">
       <div id="calendar"></div>
 

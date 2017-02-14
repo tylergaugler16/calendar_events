@@ -175,20 +175,24 @@ $('#addCalendarButton').click(function(e){
   console.log("i'm ading a calendar");
 
   e.preventDefault();
-  var name = $('[name="name"]').val();
+  var name     = $('[name="name"]').val();
   var user_id  = $('[name="user_id"]').val();
+  var pass     = $('[name="password"]').val();
   $.ajax({
     url: '/calendar/add',
     type: 'POST',
     data: {
       name: name,
-      user_id: user_id
+      user_id: user_id,
+      password: pass
     },
     success: function(response){
       console.log("added calendar");
+      $('ul').find('.active').removeClass('active');
         $('[name="name"]').val('');
         $('[name="user_id"]').val('');
-        $('#userCalendarList').append('<li><a href="#" class="calendar_options" id="'+response.user_id+'">'+ name +'</a></li>');
+        $('[name="password"]').val('');
+        $('#userCalendarList').append('<li><a href="#" class="calendar_options active" id="'+response.user_id+'">'+ name +'</a></li>');
     }
   });
 });
@@ -201,13 +205,20 @@ $('.calendar_options').click(function(e){
   $('ul').find('.active').removeClass('active');
   $(this).addClass('active');
   var id = this.id;
+  var pass = this.password;
+  var name = $(this).val();
+  console.log(id);
   $.ajax({
     url: '/events',
 
     data: {
-      calendar_id :id
+      calendar_id:  id,
+      password:     'foobar',
+      name:         'Youth Group'
     },
     success: function(response){
+      console.log(response.events);
+      console.log(response.users);
       for(var i=0;i<response.events.length;i++){
         $('#calendar').fullCalendar('addEventSource', [
           {
@@ -215,6 +226,9 @@ $('.calendar_options').click(function(e){
             start: response.events[i].start_date,
             url: "/event/"+response.events[i].id
           }], true);
+      }
+      for(var r =0;r<response.users.length;r++){
+        $('#calendarUsers ul').append('<li>'+response.users[r].username+'</li>');
       }
 
     }
