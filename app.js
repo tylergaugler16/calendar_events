@@ -9,10 +9,14 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 var config = require('./oauth');
 
 var env = process.env.NODE_ENV || 'dev';
-var connectionString = process.env.DATABASE_URL || 'postgres://' + process.env.POSTGRES_USER + ':' + process.env.POSTGRES_PASSWORD + '@localhost/calendar' ;
+// var connectionString = process.env.DATABASE_URL || 'postgres://' + process.env.POSTGRES_USER + ':' + process.env.POSTGRES_PASSWORD + '@localhost/calendar' ;
 var callback_url = 'http://localhost:3000/auth/facebook/callback';
+var client_id = config.facebook.clientID;
+var client_secret = config.facebook.clientSecret;
 if(env == 'production'){
   callback_url = 'https://weatherevent-calendar.herokuapp.com/auth/facebook/callback';
+  client_id = config.facebook_production.clientID;
+  client_secret = config.facebook_production.clientSecret;
 }
 
 var app = express();
@@ -37,12 +41,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function(user, done) {
-  // console.log("serializing"+user.displayName );
   done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-  console.log("trying to deserialize "+id);
   query(`select * from users where facebook_id='${id}'`, function(err, result){
     if(result.rowCount === 0){
       console.log("could not find user with given id");
@@ -58,14 +60,12 @@ passport.deserializeUser(function(id, done) {
 
 
 passport.use(new FacebookStrategy({
-    clientID: config.facebook.clientID,
-    clientSecret: config.facebook.clientSecret,
+    clientID: client_id,
+    clientSecret: client_secret,
     callbackURL: callback_url,
-    auth_type: "reauthenticate"
     // profileFields: ['id', 'displayName', 'link', 'about_me', 'photos', 'emails']
   },
   function(accessToken, refreshToken, profile, cb) {
-    console.log(profile);
     query(`select * from users where facebook_id='${profile.id}'`, function(err, result){
       var user = result;
       if( result.rowCount === 0 ){
@@ -102,12 +102,30 @@ function isLoggedIn(req, res, next) {
 
 
 app.get("/", isLoggedIn, function(req, res){
-  res.render('index', {user: req.user});
+  var user_calendars = {};
+  calendars = [];
+  user_calendars.calendars = calendars;
+  query(`select * from calendars where user_id=${req.user.id}`, function(err, result){
+    if(result.rowCount > 0){
+      res.render('index', {user: req.user, calendars: result.rows});
+      // for(var i=0;i<result.rows.length;i++){
+      //   user_calendars.calendars[i] = {
+      //     name: result.rows[i].name,
+      //     id: result.rows[i].id
+      //     };
+      //   }
+
+      }
+      else res.render('index', {user: req.user, calendar: []});
+
+
+    });
+
 });
 
 
 app.post("/addEvent", function(req, res){
-    query(`insert into events(title, description, start_date, user_id) values('${req.body.title.replace("'","''")}', '${req.body.description.replace("'","''")}', '${req.body.start}', ${req.body.user_id} ) returning id as last_id`, function(err, result){
+    query(`insert into events(title, description, start_date, calendar_id) values('${req.body.title.replace("'","''")}', '${req.body.description.replace("'","''")}', '${req.body.start}', ${req.body.calendar_id} ) returning id as last_id`, function(err, result){
         if(err){
           console.log(err);
         }
@@ -152,12 +170,15 @@ app.get('/logout', function (req, res){
   res.redirect('/');
 });
 
-app.get('/auth/facebook', passport.authenticate('facebook', {authType: 'reauthenticate'}),function(req, res){
+app.get('/auth/facebook', passport.authenticate('facebook'),function(req, res){
+  console.log("/AUTH/FACEBOOK");
+});
+app.get('/auth/facebook/new', passport.authenticate('facebook', {authType: 'reauthenticate'}),function(req, res){
   console.log("/AUTH/FACEBOOK");
 });
 
 app.get('/auth/facebook/callback',
-  passport.authenticate('facebook', {authType: 'reauthenticate', failureRedirect: '/login'}),
+  passport.authenticate('facebook', { failureRedirect: '/login'}),
   function(req, res) {
     console.log("CALLBACK");
     console.log(req.user.displayName);
@@ -168,14 +189,32 @@ app.get('/auth/facebook/callback',
 
 
 app.get('/events', function(req, res){
-  query(`select * from events where user_id='${req.user.id}'`, function(err, result){
-    if(err){
-      res.send(err);
-    }
-    else{
-      res.send({events: result.rows});
-    }
-  });
+  // get all events associated with calendar
+console.log(req.query.password);
+console.log(req.query.name);
+  if(req.query.password !== null && req.query.name !== null){
+    console.log("yeet");
+    console.log(req.query.password);
+    query(`select * from events where calendar_id in (select id from calendars where name='${req.query.name}' and password='${req.query.password}')`, function(err, events){
+      console.log(events.rows[0]);
+      if(err){
+        res.send(err);
+      }
+      else{
+        console.log(req.query.password);
+        query(`select * from users where id in (select user_id from calendars where password='${req.query.password}' and name ='${req.query.name}') `, function(err, result){
+          if(err){console.log(err);}
+          else{
+            res.send({events: events.rows, users: result.rows});
+          }
+        });
+      }
+    });
+
+  }
+
+  // get all user_ids assocaited with calendar
+
 });
 app.get('/events/:start', function(req, res){
 
@@ -197,6 +236,19 @@ app.get('/events/delete/:id', function(req, res){
     if(err) console.log(err);
     res.redirect("/");
   });
+});
+
+
+app.post('/calendar/add', function(req, res){
+  query(`insert into calendars(name, user_id,password) values('${req.body.name.replace("'","''")}',${req.body.user_id}, '${req.body.password}' ) returning id as last_id`, function(err, result){
+      if(err){
+        console.log(err);
+      }
+      else{
+        res.send({user_id: result.rows[0].last_id});
+      }
+  });
+
 });
 
 app.listen(process.env.PORT || 3000,function(){

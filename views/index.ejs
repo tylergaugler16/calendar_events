@@ -10,28 +10,64 @@
   <script src='/js/jquery-3.1.1.min.js'></script>
   <script src='/js/moment.min.js'></script>
   <script src='/fullcalendar-3.1.0/fullcalendar.js'></script>
-  <title>Document</title>
+  <title><%= user.username %></title>
 </head>
 <body>
-  <% if(user){ %>
-    <h1><%= user.username %></h1>
-  <% } %>
 
-  <div class="mainContainer">
-    <div id="calendar">
+<div class="userContainer">
+  <div id="userInfo">
+    <h1><%= user.username %></h1>
+    <a href="/logout">Logout</a>
+  </div>
+
+</div>
+<div class="fullWidthContainer">
+  <div id="userCalenders">
+    <div id="calendarsContainer">
+      <h1>Calendars</h1>
+      <ul id="userCalendarList">
+      <% for(var i=0;i<calendars.length;i++){ %>
+        <li><a href="#" class="calendar_options"    id="<%= calendars[i].id%>" identifier="<%=calendars[i].password %>"><%= calendars[i].name %></a></li>
+      <% } %>
+      </ul>
+
 
     </div>
-    <div class="addEvent">
-      <h1>Create an Event</h1>
+    <div id="addCalendar">
+      <h2>Add Calendar</h2>
       <form action="" method="post">
-        <input type="text" name="title" value="">
-        <input type="text" name="start" value="">
-        <textarea name="description" rows="4" cols="80"></textarea>
-        <input type="hidden" name="id" value="<%= user.id %>">
-        <input type="submit" name="" value="Create Event" id="addEventButton">
+        <h3>Name</h3>
+        <input type="text" name="name" value="" required="">
+        <h3>Unique Identifier</h3>
+        <input type="password" name="password" value="" required="">
+        <input type="hidden" name="user_id" value="<%= user.id %>">
+        <input type="submit" value="Create Calendar" id="addCalendarButton">
       </form>
     </div>
+
+    <div id="calendarUsers">
+      <h2>Users</h2>
+      <ul></ul>
+    </div>
   </div>
+
+    <div class="mainContainer">
+      <div id="calendar"></div>
+
+
+      <div class="addEvent">
+        <h1>Create an Event</h1>
+        <form action="" method="post">
+          <input type="text" name="title" value="">
+          <input type="text" name="start" value="">
+          <textarea name="description" rows="4" cols="80"></textarea>
+          <input type="submit" name="" value="Create Event" id="addEventButton">
+        </form>
+      </div>
+    </div>
+
+</div>
+
 
 <script src="/js/jsmodal-1.0d.min.js" charset="utf-8"></script>
 <script src="/js/script.js" charset="utf-8"></script>

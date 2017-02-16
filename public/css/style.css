@@ -1,16 +1,123 @@
-body{
-  /*background-color: blue;*/
+html, body {
+    width:100%;
+    height:100%;
+    margin:0;
+    padding:0;
+    background-color: #D6DADC;
+    color:#555758;
 }
+
+
 a{
   text-decoration: none;
-  color:white;
+  color:black;
 }
 a:visited{
+  color:black;
+}
+
+a.active{
+  color: orange;
+}
+input[type="submit"]{
+  background-color: #4C688B;
+  color: white;
+  border-radius: 7px;
+}
+
+#userInfo{
+  width:100%;
+  height:40px;
+  position: absolute;
+  top:0;
+  right:0;
+  left:0;
+  margin:0;
+  margin-bottom: 5px;
+  background-color: #4C688B;
+}
+#userInfo h1{
+  display: inline-block;
+  margin-top:2px;
+  margin-left:10px;
+  color: white;
+}
+#userInfo a{
+  float:right;
+  margin-top: 5px;
+  margin-right:10px;
   color:white;
 }
+#userContainer{
+  height:30px;
+  margin-bottom:10px;
+}
+#userCalenders{
+  display:inline-block;
+  width:21%;
+  height:30%;
+  margin:0;
+  margin-top: 40px;
+  background-color: #D6DADC;
+  float:left;
+  padding-left: 10px;
+
+}
+#calendarsContainer{
+  width:100%;
+  height:300px;
+  background-color: #D6DADC;
+  overflow: scroll;
+}
+#calendarsContainer ul{
+  text-decoration: none;
+  padding:0;
+}
+#calendarsContainer li{
+  display: inline-block;
+  /*width: 60%;*/
+  /*margin:10px auto;*/
+  margin:5px 5px;
+  float:left;
+  border-radius: 5px;
+  list-style-type: none;
+  background-color: #4C688B;
+  text-align: center;
+  padding: 5px;
+  box-shadow: 3px 3px 5px 0px rgba(50, 50, 50, 0.5);
+}
+#addCalendar{
+  width:100%;
+  height:200px;
+  background-color: #D6DADC;
+  padding:5px;
+}
+#addCalendar h3{
+  margin:0;
+}
+#addCalendar h2{
+  margin: 0 0 5px 0;
+}
+#calendarUsers{
+  width:100%;
+  height:400px;
+  /*background-color: blue;*/
+  background-color: #D6DADC;
+}
+.fullWidthContainer{
+  width:100%;
+  margin:0;
+}
 .mainContainer{
-  width:90%;
-  margin:25px auto;
+  display:inline-block;
+  width:77%;
+  margin:0;
+  margin-top:40px;
+  float:left;
+  padding-right:10px;
+  padding-top: 25px;
+  /*background-color: blue;*/
+  background-color: #D6DADC;
 }
 .addEvent{
   margin: 25px;
@@ -33,7 +140,11 @@ thead td{
   background-color: #4C688B;
 }
 tbody td{
-  background-color: #748BA7;
+  /*background-color: #748BA7;*/
+  background-color: #D6DADC;
+}
+.fc-unthemed td{
+  border-color: #748BA7;
 }
 .fc-unthemed td.fc-today{
   background-color: #4C688B;
