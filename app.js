@@ -60,9 +60,9 @@ passport.deserializeUser(function(id, done) {
 
 
 passport.use(new FacebookStrategy({
-    clientID: '1849910881957132',
-    clientSecret: '871897d836aaf2f8c11bd3b50eda7ce0',
-    callbackURL: 'https://weatherevent-calendar.herokuapp.com/auth/facebook/callback',
+    clientID: client_id,
+    clientSecret: client_secret,
+    callbackURL: callback_url,
     // profileFields: ['id', 'displayName', 'link', 'about_me', 'photos', 'emails']
   },
   function(accessToken, refreshToken, profile, cb) {
