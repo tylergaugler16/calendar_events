@@ -9,10 +9,14 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 var config = require('./oauth');
 
 var env = process.env.NODE_ENV || 'dev';
-var connectionString = process.env.DATABASE_URL || 'postgres://' + process.env.POSTGRES_USER + ':' + process.env.POSTGRES_PASSWORD + '@localhost/calendar' ;
+// var connectionString = process.env.DATABASE_URL || 'postgres://' + process.env.POSTGRES_USER + ':' + process.env.POSTGRES_PASSWORD + '@localhost/calendar' ;
 var callback_url = 'http://localhost:3000/auth/facebook/callback';
+var client_id = config.facebook.clientID;
+var client_secret = config.facebook.clientSecret;
 if(env == 'production'){
   callback_url = 'https://weatherevent-calendar.herokuapp.com/auth/facebook/callback';
+  client_id = config.facebook_production.clientID;
+  client_secret = config.facebook_production.clientSecret;
 }
 
 var app = express();
@@ -56,13 +60,12 @@ passport.deserializeUser(function(id, done) {
 
 
 passport.use(new FacebookStrategy({
-    clientID: config.facebook.clientID,
-    clientSecret: config.facebook.clientSecret,
+    clientID: client_id,
+    clientSecret: client_secret,
     callbackURL: callback_url,
     // profileFields: ['id', 'displayName', 'link', 'about_me', 'photos', 'emails']
   },
   function(accessToken, refreshToken, profile, cb) {
-    console.log(profile);
     query(`select * from users where facebook_id='${profile.id}'`, function(err, result){
       var user = result;
       if( result.rowCount === 0 ){
@@ -187,19 +190,29 @@ app.get('/auth/facebook/callback',
 
 app.get('/events', function(req, res){
   // get all events associated with calendar
-  query(`select * from events where calendar_id in (select id from calendars where name='${req.query.name}' and password='${req.query.password}')`, function(err, events){
-    if(err){
-      res.send(err);
-    }
-    else{
-      query(`select * from users where id in (select user_id from calendars where password='${req.query.password}' and name ='${req.query.name}') `, function(err, result){
-        if(err){console.log(err);}
-        else{
-          res.send({events: events.rows, users: result.rows});
-        }
-      });
-    }
-  });
+console.log(req.query.password);
+console.log(req.query.name);
+  if(req.query.password !== null && req.query.name !== null){
+    console.log("yeet");
+    console.log(req.query.password);
+    query(`select * from events where calendar_id in (select id from calendars where name='${req.query.name}' and password='${req.query.password}')`, function(err, events){
+      console.log(events.rows[0]);
+      if(err){
+        res.send(err);
+      }
+      else{
+        console.log(req.query.password);
+        query(`select * from users where id in (select user_id from calendars where password='${req.query.password}' and name ='${req.query.name}') `, function(err, result){
+          if(err){console.log(err);}
+          else{
+            res.send({events: events.rows, users: result.rows});
+          }
+        });
+      }
+    });
+
+  }
+
   // get all user_ids assocaited with calendar
 
 });
