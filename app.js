@@ -13,11 +13,14 @@ var env = process.env.NODE_ENV || 'dev';
 var callback_url = 'http://localhost:3000/auth/facebook/callback';
 var client_id = config.facebook.clientID;
 var client_secret = config.facebook.clientSecret;
+var secure =false;
 if(env == 'production'){
   callback_url = 'https://weatherevent-calendar.herokuapp.com/auth/facebook/callback';
   client_id = config.facebook_production.clientID;
   client_secret = config.facebook_production.clientSecret;
+  secure = true;
 }
+
 
 var app = express();
 
@@ -34,7 +37,7 @@ app.use(session({
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: (env == 'production')} // set secure to true if in production. for https
+  cookie: { secure: secure} // set secure to true if in production. for https
 }));
 
 app.use(passport.initialize());
