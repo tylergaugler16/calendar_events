@@ -259,3 +259,13 @@ app.post('/calendar/add', function(req, res){
 app.listen(process.env.PORT || 3000,function(){
   console.log("listening on port 3000");
 });
+
+setInterval(sessionCleanup, 24 * 60 * 60 * 1000);
+
+function sessionCleanup() {
+    sessionStore.all(function(err, sessions) {
+        for (var i = 0; i < sessions.length; i++) {
+            sessionStore.get(sessions[i], function() {} );
+        }
+    });
+}
