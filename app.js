@@ -9,17 +9,9 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 var config = require('./oauth');
 
 var env = process.env.NODE_ENV || 'dev';
+
 // var connectionString = process.env.DATABASE_URL || 'postgres://' + process.env.POSTGRES_USER + ':' + process.env.POSTGRES_PASSWORD + '@localhost/calendar' ;
-var callback_url = 'http://localhost:3000/auth/facebook/callback';
-var client_id = config.facebook.clientID;
-var client_secret = config.facebook.clientSecret;
-var secure =false;
-if(env == 'production'){
-  callback_url = 'https://weatherevent-calendar.herokuapp.com/auth/facebook/callback';
-  client_id = config.facebook_production.clientID;
-  client_secret = config.facebook_production.clientSecret;
-  secure = true;
-}
+
 
 
 var app = express();
@@ -31,15 +23,25 @@ app.set('views', './views');
 app.use(express.static('public'));
 
 
-
-app.set('trust proxy', 1);
-app.use(session({
+var sess = {
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: secure} // set secure to true if in production. for https
-}));
+  cookie: {}
+};
+var callback_url = 'http://localhost:3000/auth/facebook/callback';
+var client_id = config.facebook.clientID;
+var client_secret = config.facebook.clientSecret;
+if(env == 'production'){
+  callback_url = 'https://weatherevent-calendar.herokuapp.com/auth/facebook/callback';
+  client_id = config.facebook_production.clientID;
+  client_secret = config.facebook_production.clientSecret;
+  secure = true;
+  app.set('trust proxy', 1);
+  sess.cookie.secure = true;
+}
 
+app.use(session(sess));
 app.use(passport.initialize());
 app.use(passport.session());
 
