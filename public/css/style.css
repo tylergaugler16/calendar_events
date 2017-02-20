@@ -1,4 +1,4 @@
-html, body {
+html {
     width:100%;
     height:100%;
     margin:0;
@@ -7,13 +7,23 @@ html, body {
     color:#555758;
 }
 
+html{
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+.login-bg {
+  background: url(/images/login.jpeg) no-repeat center center fixed;
+  background-color: transparent;
+}
 
 a{
   text-decoration: none;
-  color:black;
+  color:#555758;
 }
 a:visited{
-  color:black;
+  color:#555758;
 }
 
 a.active{
@@ -169,4 +179,25 @@ a.fc-event{
 /*event page*/
 #deleteEvent{
   color:red;
+}
+
+/*login page */
+
+.loginContainer{
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  width:30%;
+  background-color: white;
+  /*color: white;*/
+  transform: translate(-50%,-50%);
+  text-align: center;
+  padding: 15px;
+}
+
+#facebook{
+  color:#3B5998;
+}
+#loginForm input{
+  width:100%;
 }
