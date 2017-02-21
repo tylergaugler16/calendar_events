@@ -131,7 +131,7 @@ app.get("/", isLoggedIn, function(req, res){
 
 
 app.post("/addEvent", function(req, res){
-    query(`insert into events(title, description, start_date, calendar_id) values('${req.body.title.replace("'","''")}', '${req.body.description.replace("'","''")}', '${req.body.start}', ${req.body.calendar_id} ) returning id as last_id`, function(err, result){
+    query(`insert into events(title, description, start_date, calendar_id) values('${req.body.title.replace("'","''")}', '${req.body.description.replace("'","''")}', '${req.body.start}', '${req.body.calendar_id}' ) returning id as last_id`, function(err, result){
         if(err){
           console.log(err);
         }
@@ -196,7 +196,6 @@ app.get('/auth/facebook/callback',
 
 app.get('/events', function(req, res){
   // get all events associated with calendar
-console.log(req.query.password);
 console.log(req.query.name);
   if(req.query.password !== null && req.query.name !== null){
     console.log("yeet");
@@ -252,7 +251,7 @@ app.post('/calendar/add', function(req, res){
         console.log(err);
       }
       else{
-        res.send({user_id: result.rows[0].last_id});
+        res.send({user_id: result.rows[0].last_id, password: password});
       }
   });
 

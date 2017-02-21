@@ -31,7 +31,8 @@ $('#addEventButton').click(function(e){
   var title = $('[name="title"]').val();
   var desc  = $('[name="description"]').val();
   var start = $('[name="start"]').val();
-  var id    = $('.active')[0].id;
+  var id    = $('.active :first-child')[0].id;
+  console.log(id);
   $.ajax({
     url: '/addEvent',
     type: 'POST',
@@ -76,15 +77,14 @@ $('#addCalendarButton').click(function(e){
     data: {
       name: name,
       user_id: user_id,
-      password: pass
     },
     success: function(response){
       console.log("added calendar");
       $('ul').find('.active').removeClass('active');
         $('[name="name"]').val('');
         $('[name="password"]').val('');
-        $('#userCalendarList').append('<li><a href="#" class="calendar_options active" identifier="'+ pass+'"id="'+response.user_id+'">'+ name +'</a></li>');
-
+        $('#userCalendarList').append('<li class="active"><a href="#" class="calendar_options" identifier="'+ response.password+'"id="'+response.user_id+'">'+ name +'</a></li>');
+        // $('.calendar_options :last-child').click();
     }
   });
 });
@@ -92,11 +92,12 @@ $('#addCalendarButton').click(function(e){
 
 //returns events and users belonging to a specific calendar
 $('.calendar_options').click(function(e){
+    console.log("yeet");
     e.preventDefault();
     $('#calendar').fullCalendar('removeEvents');
     var active = $('li.active');
     $('ul').find('.active').removeClass('active');
-    $(this).addClass('active');
+    $(this).parent('li').addClass('active');
     var id = this.id;
     var pass = $(this).attr('identifier');
     console.log(pass);
@@ -156,7 +157,7 @@ $('.calendar_options').click(function(e){
         $('ul').find('.active').removeClass('active');
           $('[name="name"]').val('');
           $('[name="password"]').val('');
-          $('#userCalendarList').append('<li><a href="#" class="calendar_options active" identifier="'+ pass+'"id="'+user_id+'">'+ response.name +'</a></li>');
+          $('#userCalendarList').append('<li class="active"><a href="#" class="calendar_options" identifier="'+ pass+'"id="'+user_id+'">'+ response.name +'</a></li>');
 
       }
     });
