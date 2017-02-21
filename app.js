@@ -4,6 +4,7 @@ var query       = require('./query');
 var bcrypt      = require('bcrypt');
 var session = require('express-session');
 var passport    = require('passport');
+var randomstring = require('randomstring')
 
 var FacebookStrategy = require('passport-facebook').Strategy;
 var config = require('./oauth');
@@ -200,7 +201,7 @@ console.log(req.query.name);
   if(req.query.password !== null && req.query.name !== null){
     console.log("yeet");
     console.log(req.query.password);
-    query(`select * from events where calendar_id in (select id from calendars where name='${req.query.name}' and password='${req.query.password}')`, function(err, events){
+    query(`select * from events where calendar_id in (select id from calendars where password='${req.query.password}')`, function(err, events){
       console.log(events.rows[0]);
       if(err){
         res.send(err);
@@ -245,7 +246,8 @@ app.get('/events/delete/:id', function(req, res){
 
 
 app.post('/calendar/add', function(req, res){
-  query(`insert into calendars(name, user_id,password) values('${req.body.name.replace("'","''")}',${req.body.user_id}, '${req.body.password}' ) returning id as last_id`, function(err, result){
+  password = randomstring.generate(10);
+  query(`insert into calendars(name, user_id,password) values('${req.body.name.replace("'","''")}',${req.body.user_id}, '${password}' ) returning id as last_id`, function(err, result){
       if(err){
         console.log(err);
       }
@@ -254,6 +256,29 @@ app.post('/calendar/add', function(req, res){
       }
   });
 
+});
+
+app.post('/calendar/join', function(req, res){
+  query(`select name from calendars where password ='${req.body.password}'`, function(err, result){
+    if(err){
+      console.log(err);
+      res.sendStatus(404);
+    }
+    else if(result.rowCount > 0){
+      name = result.rows[0].name;
+      query(`insert into calendars(name, user_id, password) values('${name}','${req.body.user_id}','${req.body.password}') returning id as last_id`, function(err, result){
+        if(err){
+          console.log(err);
+        }
+        else{
+          res.send({user_id: result.rows[0].last_id, name: name});
+        }
+      });
+    }
+    else{
+      res.sendStatus(404);
+    }
+  });
 });
 
 app.listen(process.env.PORT || 3000,function(){

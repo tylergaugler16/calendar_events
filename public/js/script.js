@@ -128,6 +128,40 @@ $('.calendar_options').click(function(e){
         }
       });
   });
+  $('#joinCalendar').click(function(e){
+    Modal.open({
+                        content: '<div id="joinCalendarModal"><h3>Calendar Invite Code</h3><form action=""> <input type="text" name="password" value=""><input type="hidden" name="user_id" value="<%= user.id %>"><input type="submit" name="" id="joinCalendarButton" value="Join"></form></div> ',
+                        width: '40%',
+                        height: '20%',
+                        hideclose: true
+                       });
+  });
+
+  $('#joinCalendarButton').click(function(e){
+    console.log("yeer");
+    e.preventDefault();
+    var user_id  = $('[name="user_id"]').val();
+    var pass     = $('[name="password"]').val();
+
+    $.ajax({
+      url: '/calendar/join',
+      type: 'POST',
+      data: {
+        user_id: user_id,
+        password: pass
+      },
+      success: function(response){
+        console.log(response);
+        console.log("added calendar");
+        $('ul').find('.active').removeClass('active');
+          $('[name="name"]').val('');
+          $('[name="password"]').val('');
+          $('#userCalendarList').append('<li><a href="#" class="calendar_options active" identifier="'+ pass+'"id="'+user_id+'">'+ response.name +'</a></li>');
+
+      }
+    });
+
+  });
 
 
 });

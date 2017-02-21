@@ -1,12 +1,12 @@
 ﻿#modal-overlay {
-  background: #fff;
+  background: rgba(0,0,0,0.5);
   filter: alpha(opacity=60);
   height: 100%;
   left: 0;
   -moz-opacity: 0.6;
   -webkit-opacity: 0.6;
   -ms-filter: alpha(opacity=60);
-  opacity: 0.6;
+  /*opacity: 0.6;*/
   position: absolute;
   top: 0;
   width: 100%;
