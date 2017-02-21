@@ -5,6 +5,8 @@ html {
     padding:0;
     background-color: #D6DADC;
     color:#555758;
+    font-family: 'Roboto','PT Serif',Helvetica,Arial,sans-serif;
+     word-spacing: 2px;
 }
 
 html{
@@ -26,9 +28,7 @@ a:visited{
   color:#555758;
 }
 
-a.active{
-  color: orange;
-}
+
 input[type="submit"]{
   background-color: #4C688B;
   color: white;
@@ -37,7 +37,7 @@ input[type="submit"]{
 
 #userInfo{
   width:100%;
-  height:40px;
+  height:45px;
   position: absolute;
   top:0;
   right:0;
@@ -96,6 +96,15 @@ input[type="submit"]{
   padding: 5px;
   box-shadow: 3px 3px 5px 0px rgba(50, 50, 50, 0.5);
 }
+#calendarsContainer li a{
+  color:#c9d1dc;
+}
+#calendarsContainer li.active{
+  background-color: #c9d1dc;
+}
+#calendarsContainer .active a{
+  color:#4C688B;
+}
 #addCalendar{
   width:100%;
   height:250px;
@@ -103,10 +112,11 @@ input[type="submit"]{
   padding:5px;
 }
 #addCalendar h3{
-  margin:0;
+  margin:7px 0;
 }
 #addCalendar h2{
-  margin: 0 0 5px 0;
+  margin: 0 0 10px 0;
+  text-decoration: underline;
 }
 #joinCalendarModal{
   width: 200px;
@@ -123,6 +133,9 @@ input[type="submit"]{
   height:400px;
   /*background-color: blue;*/
   background-color: #D6DADC;
+}
+#calendarUsers h2{
+  text-decoration: underline;
 }
 .fullWidthContainer{
   width:100%;
@@ -149,6 +162,7 @@ form input{
 
 #modal-container{
   overflow: scroll;
+  background-color: #D6DADC;
 }
 #modalDate{
   float:right;
@@ -191,6 +205,24 @@ a.fc-event{
   color:red;
 }
 
+[tooltip]:before {
+    position : absolute;
+     content : attr(tooltip);
+     font-size: 0.8em;
+     opacity : 0;
+     width:200px;
+     transition: all 0.15s ease;
+     padding: 5px 10px;
+     color: #4C688B;
+     border-radius: 10px;
+     box-shadow: 2px 2px 1px silver;
+}
+[tooltip]:hover:before {
+    opacity : 1;
+    background: #c9d1dc;
+    margin-top: 30px;
+}
+
 /*login page */
 
 .loginContainer{
@@ -202,9 +234,20 @@ a.fc-event{
   /*color: white;*/
   transform: translate(-50%,-50%);
   text-align: center;
-  padding: 15px;
+  padding: 25px;
+  border-radius: 5px;
+  box-shadow: 3px 3px 5px 0px rgba(50, 50, 50, 0.5);
 }
-
+#loginFacebookLink{
+  height: 30px;
+  display: table;
+  width: 100%;
+}
+#loginFacebookLink span{
+  vertical-align: middle;
+  display: table-cell;
+  padding-right: 15px;
+}
 #facebook{
   color:#3B5998;
 }

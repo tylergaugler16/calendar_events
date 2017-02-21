@@ -13,7 +13,10 @@
   <div class="fullWidthContainer">
     <div class="loginContainer">
       <h1>Welcome to EventPlanner!</h1>
-      <a href="/auth/facebook"><span>Login With Facebook</span><i class="fa fa-facebook-official fa-2x" id="facebook" aria-hidden="true"></i></a>
+      <div id="loginFacebookLink">
+        <a href="/auth/facebook"><span>Login With Facebook   </span><i class="fa fa-facebook-official fa-2x" id="facebook" aria-hidden="true"></i></a>
+      </div>
+
 
       <form action="/login" method="post" id="loginForm">
         <input type="text" name="username" value="" placeholder="username">
