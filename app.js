@@ -4,7 +4,7 @@ var query       = require('./query');
 var bcrypt      = require('bcrypt');
 var session = require('express-session');
 var passport    = require('passport');
-var randomstring = require('randomstring')
+var randomstring = require('randomstring');
 
 var FacebookStrategy = require('passport-facebook').Strategy;
 var config = require('./oauth');
@@ -142,12 +142,7 @@ app.post("/addEvent", function(req, res){
 
 });
 
-app.get("/event/:id", function(req, res){
-  console.log("yeet");
-  query('select * from events where id=$1',[req.params.id],function(err, result){
-      res.render('event',{event: result.rows[0]});
-  });
-});
+
 
 app.get("/login", function(req, res){
   res.render('login');
@@ -265,7 +260,7 @@ app.post('/calendar/join', function(req, res){
     }
     else if(result.rowCount > 0){
       name = result.rows[0].name;
-      query(`insert into calendars(name, user_id, password) values('${name}','${req.body.user_id}','${req.body.password}') returning id as last_id`, function(err, result){
+    query(`insert into calendars(name, user_id, password) svalues('${name}','${req.body.user_id}','${req.body.password}') returning id as last_id`, function(err, result){
         if(err){
           console.log(err);
         }
@@ -279,6 +274,60 @@ app.post('/calendar/join', function(req, res){
     }
   });
 });
+
+app.post('/calendar/delete', function(req, res){
+  query(`delete from events where calendar_id='${req.body.id}'`, function(err, result){
+    if(err){
+      console.log(err);
+    }
+    else{
+      query(`delete from calendars where id = '${req.body.id}'`, function(err, result){
+        if(err){
+          console.log(err);
+          res.sendStatus(404);
+        }
+        else{
+          res.sendStatus(200);
+        }
+      });
+    }
+  });
+});
+
+app.post('/event/comment/add', function(req, res){
+  query(`insert into event_comments(user_id, comment, date, event_id, username) values(
+    '${req.body.user_id}', '${req.body.comment}', '${req.body.date}', '${req.body.event_id}', '${req.body.username}')`,
+    function(err, result){
+      if(err){
+        console.log(err);
+        res.sendStatus(404);
+      }
+      else{
+        res.sendStatus(200);
+      }
+    });
+});
+
+app.get('/event/comments', function(req, res){
+  query(`select * from event_comments where event_id= '${req.query.event_id}'`, function(err, result){
+    if(err){
+      console.log(err);
+      res.sendStatus(404);
+    }
+    else{
+      res.send({comments: result.rows});
+    }
+  });
+});
+app.get("/event/:id", function(req, res){
+  console.log("yeet");
+  query('select * from events where id=$1',[req.params.id],function(err, result){
+      res.render('event',{event: result.rows[0]});
+  });
+});
+
+
+
 
 app.listen(process.env.PORT || 3000,function(){
   console.log("listening on port 3000");

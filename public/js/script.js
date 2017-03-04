@@ -1,26 +1,79 @@
 $(document).ready(function() {
 
-// creates calender
-// adds ajax call to dayClick functin to get weather for specific dayClick
-// then makes ajax call to check if day has any events
-// displays weather info and event info if they are available
+// creates calendar
 
     $('#calendar').fullCalendar({
       fixedWeekCount: false,
+      header: {
+        left: 'title',
+        center: 'identifier',
+        right: 'month, basicWeek, week, prev, next'
+      },
+      views: {
+        month: {
+          eventLimit: 4
+        },
+        basicWeek: {
+
+        }
+
+      },
       dayClick: function(date, allDay, jsEvent, view) {
 
             $('[name="start"]').val(date.format());
             var day;
-            // Modal.open({
-            //          content: '<h1>'+title+ '</h1><p>'+description+'</p>',
-            //          width: '50%',
-            //          height: '60%',
-            //          hideclose: true
-            //        });
+      },
+      eventClick: function(calEvent, jsEvent, view) {
 
+          $('#modalTitle').html(calEvent.title);
+          $('#modalDescription').html(calEvent.description);
+          $('#eventId').val(calEvent.id);
+          $('#overlay, #modal, #eventComments').css('display','initial');
+          var id = $('#eventId').val();
+          $.ajax({
+            url: '/event/comments',
+            method: 'GET',
+            data: {
+              event_id: id
+            },
+            success: function(result){
+              for(var i = result.comments.length-1;i >= 0;i--){
+                $('<div class="comment"><div class="commentHeader"><div class="commentAuthor"><span>'+result.comments[i].username+'</span></div><div class="commentDate"><span>'+result.comments[i].date+'</span></div></div><div class="commentContent">'+result.comments[i].comment+'</div></div>').insertBefore('#addComment');
+              }
+
+            }
+
+          });
+      },
+      eventRender: function(event, element, view) {
+          if(view.name === 'basicWeek') {
+              $(element).css('padding','15px 2px');
+          }
       }
     });
 
+    $('.fc-left h2').after('<h3 id="calendar_identifier"></h3>');
+    $('#calendar').after('<a href="#" id="deleteCalendar"></a>');
+
+
+// display event Modal.. need to do click event this way b/c events are dynamically added
+$('body').on('click','.fc-event',function(e){
+  e.preventDefault();
+});
+
+$('#closeModal, #overlay').click(function(e){
+  e.preventDefault();
+  $('#overlay, #modal,#joinCalendarContainer, #addComment,#modalDescription').css('display','none');
+  $('#modalTitle, #modalDescription').html('');
+  $('.comment').remove(); //removes all comments
+  $('#modal').css('height','80%');
+});
+
+$('#joinCalendar').click(function(e){
+  e.preventDefault();
+  $('#joinCalendarContainer, #overlay, #modal').css('display','initial');
+  $('#modal').css('height','40%');
+});
 
 
 // adds event to calendar
@@ -44,8 +97,7 @@ $('#addEventButton').click(function(e){
     },
     success: function(response){
 
-      console.log("successful transaction");
-      console.log(title+start);
+      console.log("added event");
       $('#calendar').fullCalendar('addEventSource', [
         {
           title: title,
@@ -65,12 +117,22 @@ $('#addEventButton').click(function(e){
 
 // adds a calendar
 $('#addCalendarButton').click(function(e){
-  console.log("i'm ading a calendar");
 
   e.preventDefault();
   var name     = $('[name="name"]').val();
   var user_id  = $('[name="user_id"]').val();
   var pass     = $('[name="password"]').val();
+  if(name === ''){
+    $('[name="name"]').focus(function(){
+      $(this).css({
+        'outline': 'none !important',
+        'border':'1px solid red' ,
+        'box-shadow': '0 0 10px'
+      });
+    });
+    $('[name="name"]').focus();
+    return false;
+  }
   $.ajax({
     url: '/calendar/add',
     type: 'POST',
@@ -92,7 +154,6 @@ $('#addCalendarButton').click(function(e){
 
 //returns events and users belonging to a specific calendar
 $('.calendar_options').click(function(e){
-    console.log("yeet");
     e.preventDefault();
     $('#calendar').fullCalendar('removeEvents');
     var active = $('li.active');
@@ -100,9 +161,7 @@ $('.calendar_options').click(function(e){
     $(this).parent('li').addClass('active');
     var id = this.id;
     var pass = $(this).attr('identifier');
-    console.log(pass);
     var name = $(this).html();
-    console.log(name);
     $.ajax({
         url: '/events',
 
@@ -112,34 +171,33 @@ $('.calendar_options').click(function(e){
           name:         name,
         },
         success: function(response){
-          console.log(response.events);
-          console.log(response.users);
+          console.log("got calendar events!");
           for(var i=0;i<response.events.length;i++){
             $('#calendar').fullCalendar('addEventSource', [
               {
                 title: response.events[i].title,
                 start: response.events[i].start_date,
-                url: "/event/"+response.events[i].id
+                id: response.events[i].id,
+                url: '#',
+                description: response.events[i].description
+                // url: "/event/"+response.events[i].id
               }], true);
           }
           $('#calendarUsers ul').empty();
           for(var r =0;r<response.users.length;r++){
             $('#calendarUsers ul').append('<li>'+response.users[r].username+'</li>');
           }
+          $('#calendar_identifier, #deleteCalendar').html('');
+          $('#calendar_identifier').html('Invite Code: '+pass);
+          $('#deleteCalendar').html('Delete Calendar: '+name);
+          $('#deleteCalendar').attr('calendar_id',id);
         }
       });
   });
-  $('#joinCalendar').click(function(e){
-    Modal.open({
-                        content: '<div id="joinCalendarModal"><h3>Calendar Invite Code</h3><form action=""> <input type="text" name="password" value=""><input type="hidden" name="user_id" value="<%= user.id %>"><input type="submit" name="" id="joinCalendarButton" value="Join"></form></div> ',
-                        width: '40%',
-                        height: '20%',
-                        hideclose: true
-                       });
-  });
+
+
 
   $('#joinCalendarButton').click(function(e){
-    console.log("yeer");
     e.preventDefault();
     var user_id  = $('[name="user_id"]').val();
     var pass     = $('[name="password"]').val();
@@ -152,8 +210,7 @@ $('.calendar_options').click(function(e){
         password: pass
       },
       success: function(response){
-        console.log(response);
-        console.log("added calendar");
+        console.log("joined calendar");
         $('ul').find('.active').removeClass('active');
           $('[name="name"]').val('');
           $('[name="password"]').val('');
@@ -163,6 +220,57 @@ $('.calendar_options').click(function(e){
     });
 
   });
+
+$('body').on('click','#deleteCalendar', function(e){
+  e.preventDefault();
+  if(confirm("Are you sure you want to delete your calendar? This calendar will be deleted for all users associated with this calendar ")){
+    calendar_id = $(this).attr('calendar_id');
+    $.ajax({
+      url: '/calendar/delete',
+      type: 'POST',
+      data: {
+        id: calendar_id
+      },
+      success: function(response){
+        $('li.active a#'+calendar_id).parent().remove();
+        $('#calendar').fullCalendar('removeEvents');
+        console.log("DELETED CALENDAR");
+      }
+    });
+  }
+
+  // console.log(this.id);
+
+});
+
+$('#addCommentButton').click(function(e){
+  e.preventDefault();
+  var comment  = $('[name="event_comment"]').val();
+  var user_id  = $('[name="user_id"]').val();
+  var current_date = new Date();
+  var date = current_date.toLocaleTimeString('en-GB', { hour: "numeric", minute: "numeric"})+ ' ' + current_date.toLocaleDateString();
+  var event_id = $('[name="eventId"]').val();
+  var username = $('#userInfo h1').html();
+  $.ajax({
+    url: '/event/comment/add',
+    type: 'post',
+    data: {
+      comment: comment,
+      user_id: user_id,
+      date: date,
+      event_id : event_id,
+      username: username,
+    },
+    success: function(response){
+      var $first = $('#eventComments div').first();
+      $('<div class="comment"><div class="commentHeader"><div class="commentAuthor"><span>'+username+'</span></div><div class="commentDate"><span>'+date+'</span></div></div><div class="commentContent">'+comment+'</div></div>').insertBefore($first);
+      $('[name="event_comment"]').val('');
+      console.log("added comment");
+    }
+
+  });
+
+});
 
 
 });
