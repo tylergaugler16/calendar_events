@@ -260,7 +260,7 @@ app.post('/calendar/join', function(req, res){
     }
     else if(result.rowCount > 0){
       name = result.rows[0].name;
-    query(`insert into calendars(name, user_id, password) svalues('${name}','${req.body.user_id}','${req.body.password}') returning id as last_id`, function(err, result){
+    query(`insert into calendars(name, user_id, password) values('${name}','${req.body.user_id}','${req.body.password}') returning id as last_id`, function(err, result){
         if(err){
           console.log(err);
         }

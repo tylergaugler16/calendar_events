@@ -24,11 +24,10 @@ $(document).ready(function() {
             var day;
       },
       eventClick: function(calEvent, jsEvent, view) {
-
+          console.log(calEvent);
           $('#modalTitle').html(calEvent.title);
           $('#modalDescription').html(calEvent.description);
           $('#eventId').val(calEvent.id);
-          $('#overlay, #modal, #eventComments').css('display','initial');
           var id = $('#eventId').val();
           $.ajax({
             url: '/event/comments',
@@ -40,7 +39,8 @@ $(document).ready(function() {
               for(var i = result.comments.length-1;i >= 0;i--){
                 $('<div class="comment"><div class="commentHeader"><div class="commentAuthor"><span>'+result.comments[i].username+'</span></div><div class="commentDate"><span>'+result.comments[i].date+'</span></div></div><div class="commentContent">'+result.comments[i].comment+'</div></div>').insertBefore('#addComment');
               }
-
+              $('#modalDescription').css('display','block');
+              $('#overlay, #modal, #eventComments').css('display','initial');
             }
 
           });
@@ -63,14 +63,16 @@ $('body').on('click','.fc-event',function(e){
 
 $('#closeModal, #overlay').click(function(e){
   e.preventDefault();
-  $('#overlay, #modal,#joinCalendarContainer, #addComment,#modalDescription').css('display','none');
-  $('#modalTitle, #modalDescription').html('');
+  $('#overlay, #modal,#joinCalendarContainer,#modalDescription').css('display','none');
+  $('#addComment').css('display','initial');
+  $('#modalTitle').html('');
   $('.comment').remove(); //removes all comments
   $('#modal').css('height','80%');
 });
 
 $('#joinCalendar').click(function(e){
   e.preventDefault();
+  $('#addComment').css('display','none');
   $('#joinCalendarContainer, #overlay, #modal').css('display','initial');
   $('#modal').css('height','40%');
 });
@@ -102,8 +104,9 @@ $('#addEventButton').click(function(e){
         {
           title: title,
           start: start,
-          url: "/event/"+response.event.last_id,
-          id: response.event.last_id
+          url: "#",
+          id: response.event.last_id,
+          description: desc
         }], true);
         $('html, body').animate({
           scrollTop: $("#calendar").offset().top
@@ -142,10 +145,12 @@ $('#addCalendarButton').click(function(e){
     },
     success: function(response){
       console.log("added calendar");
+      $('#calendar').fullCalendar('removeEvents');
       $('ul').find('.active').removeClass('active');
-        $('[name="name"]').val('');
-        $('[name="password"]').val('');
-        $('#userCalendarList').append('<li class="active"><a href="#" class="calendar_options" identifier="'+ response.password+'"id="'+response.user_id+'">'+ name +'</a></li>');
+      $('[name="name"]').val('');
+      $('[name="password"]').val('');
+      $('#userCalendarList').append('<li class="active"><a href="#" class="calendar_options" identifier="'+ response.password+'"id="'+response.user_id+'">'+ name +'</a></li>');
+
         // $('.calendar_options :last-child').click();
     }
   });
@@ -153,7 +158,8 @@ $('#addCalendarButton').click(function(e){
 
 
 //returns events and users belonging to a specific calendar
-$('.calendar_options').click(function(e){
+$('body').on('click', '.calendar_options', function(e){
+  console.log("heereee");
     e.preventDefault();
     $('#calendar').fullCalendar('removeEvents');
     var active = $('li.active');
@@ -210,12 +216,14 @@ $('.calendar_options').click(function(e){
         password: pass
       },
       success: function(response){
+        $('#calendar').fullCalendar('removeEvents');
         console.log("joined calendar");
         $('ul').find('.active').removeClass('active');
-          $('[name="name"]').val('');
-          $('[name="password"]').val('');
-          $('#userCalendarList').append('<li class="active"><a href="#" class="calendar_options" identifier="'+ pass+'"id="'+user_id+'">'+ response.name +'</a></li>');
-
+        $('[name="name"]').val('');
+        $('[name="password"]').val('');
+        $('#userCalendarList').append('<li class="active"><a href="#" class="calendar_options" identifier="'+ pass+'"id="'+user_id+'">'+ response.name +'</a></li>');
+        $('#closeModal').click();
+        $('#userCalendarList').find('.active a').trigger('click');
       }
     });
 
