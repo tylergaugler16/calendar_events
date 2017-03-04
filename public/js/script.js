@@ -24,11 +24,10 @@ $(document).ready(function() {
             var day;
       },
       eventClick: function(calEvent, jsEvent, view) {
-
+          console.log(calEvent);
           $('#modalTitle').html(calEvent.title);
           $('#modalDescription').html(calEvent.description);
           $('#eventId').val(calEvent.id);
-          $('#overlay, #modal, #eventComments').css('display','initial');
           var id = $('#eventId').val();
           $.ajax({
             url: '/event/comments',
@@ -40,7 +39,7 @@ $(document).ready(function() {
               for(var i = result.comments.length-1;i >= 0;i--){
                 $('<div class="comment"><div class="commentHeader"><div class="commentAuthor"><span>'+result.comments[i].username+'</span></div><div class="commentDate"><span>'+result.comments[i].date+'</span></div></div><div class="commentContent">'+result.comments[i].comment+'</div></div>').insertBefore('#addComment');
               }
-
+              $('#overlay, #modal, #eventComments').css('display','initial');
             }
 
           });
@@ -63,7 +62,8 @@ $('body').on('click','.fc-event',function(e){
 
 $('#closeModal, #overlay').click(function(e){
   e.preventDefault();
-  $('#overlay, #modal,#joinCalendarContainer, #addComment,#modalDescription').css('display','none');
+  $('#overlay, #modal,#joinCalendarContainer,#modalDescription').css('display','none');
+  $('#addComment').css('display','initial');
   $('#modalTitle, #modalDescription').html('');
   $('.comment').remove(); //removes all comments
   $('#modal').css('height','80%');
@@ -71,6 +71,7 @@ $('#closeModal, #overlay').click(function(e){
 
 $('#joinCalendar').click(function(e){
   e.preventDefault();
+  $('#addComment').css('display','none');
   $('#joinCalendarContainer, #overlay, #modal').css('display','initial');
   $('#modal').css('height','40%');
 });
@@ -102,8 +103,9 @@ $('#addEventButton').click(function(e){
         {
           title: title,
           start: start,
-          url: "/event/"+response.event.last_id,
-          id: response.event.last_id
+          url: "#",
+          id: response.event.last_id,
+          description: desc
         }], true);
         $('html, body').animate({
           scrollTop: $("#calendar").offset().top
