@@ -54,7 +54,7 @@ $(document).ready(function() {
 
     $('.fc-left h2').after('<h3 id="calendar_identifier"></h3>');
     $('#calendar').after('<a href="#" id="deleteCalendar"></a>');
-
+    $('#userCalendarList').find('li:first a').trigger('click'); // triggers click of first calendar
 
 // display event Modal.. need to do click event this way b/c events are dynamically added
 $('body').on('click','.fc-event',function(e){
