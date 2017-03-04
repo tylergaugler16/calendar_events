@@ -34,6 +34,9 @@ input[type="submit"]{
   color: white;
   border-radius: 7px;
 }
+input[name="name"]{
+  outline:none;
+}
 
 #userInfo{
   width:100%;
@@ -62,7 +65,7 @@ input[type="submit"]{
   height:30px;
   margin-bottom:10px;
 }
-#userCalenders{
+#userCalendars{
   display:inline-block;
   width:21%;
   height:30%;
@@ -118,15 +121,30 @@ input[type="submit"]{
   margin: 0 0 10px 0;
   text-decoration: underline;
 }
-#joinCalendarModal{
-  width: 200px;
-  position: absolute;;
+#addCalendarButton{
+  color:#c9d1dc;
+  padding: 3px 6px;
+  border-color: transparent;
+}
+#joinCalendarContainer{
+  width: 60%;
+  position: absolute;
   top:50%;
   left:50%;
   transform: translate(-50%,-50%);
+  text-align: center;
 }
-#joinCalendarModal input{
+#joinCalendarContainer input{
   width:100%;
+}
+#joinCalendarButton{
+  color:#c9d1dc;
+  padding: 3px 6px;
+  border-color: transparent;
+}
+#joinCalendarContainer p{
+  color:#A63A4B;
+  margin-top: 10px;
 }
 #calendarUsers{
   width:100%;
@@ -149,7 +167,6 @@ input[type="submit"]{
   float:left;
   padding-right:10px;
   padding-top: 25px;
-  /*background-color: blue;*/
   background-color: #D6DADC;
 }
 .addEvent{
@@ -160,16 +177,6 @@ form input{
   margin: 10px 0;
 }
 
-#modal-container{
-  overflow: scroll;
-  background-color: #D6DADC;
-}
-#modalDate{
-  float:right;
-}
-.modalContent h1{
-  margin-top:0;
-}
 thead td{
   background-color: #4C688B;
 }
@@ -189,17 +196,83 @@ span.fc-title{
 a.fc-event{
   background-color: #143054;
   padding:2px;
-
 }
-#addEventModal{
+div.fc-popover .fc-header{
+  background-color: blue;
+}
+#calendar_identifier{
+  color:#A63A4B;
+  margin:4px 40px;
+}
+#overlay{
+  position: fixed;
+  width:100%;
+  height:100%;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 99;
+  top:0;
+  left:0;
+}
+#modal{
+  position: fixed;
+  width:60%;
+  height:80%;
+  background-color: #D6DADC;
+  z-index: 100;
+  top:50%;
+  left:50%;
+  transform: translate(-50%,-50%);
+  padding:10px;
+  border-radius: 5px;
+  overflow: scroll;
+}
+#closeModal{
+  position: absolute;
+  top:10px;
+  right:10px;
+}
+#modalTitle{
+  color:#4C688B;
+}
+#modalDescription{
+  width: 80%;
+  padding:10px;
   margin: 10px auto;
   background-color: #4C688B;
-  width: 180px;
-  padding: 6px;
-  border-radius: 2px;
+  color: #f5f5f5;
+}
+#modal #modalTitle{
   text-align: center;
 }
-
+#addComment{
+  width:80%;
+  margin:20px auto;
+}
+#addComment input, #addComment textarea{
+  display: block;
+  margin:10px auto;
+}
+.comment{
+  width:80%;
+  padding:10px;
+  margin: 20px auto;
+}
+.commentAuthor, .commentDate{
+  /*width:115px;*/
+  padding: 0px 5px;
+  display: inline-block;
+  font-size: 0.8em;
+}
+.commentAuthor{
+  float:left;
+}
+.commentDate{
+  float:right;
+}
+.commentContent{
+  border-top: 1px solid #555758;
+  clear:both;
+}
 /*event page*/
 #deleteEvent{
   color:red;
