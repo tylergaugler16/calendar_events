@@ -26,7 +26,7 @@ $(document).ready(function() {
       eventClick: function(calEvent, jsEvent, view) {
           console.log(calEvent);
           $('#modalTitle').html(calEvent.title);
-          $('#modalDescription').html(calEvent.description);
+          $('#modalDescription').html($.parseHTML(calEvent.description));
           $('#eventId').val(calEvent.id);
           var id = $('#eventId').val();
           $.ajax({
@@ -50,11 +50,11 @@ $(document).ready(function() {
               $(element).css('padding','15px 2px');
           }
       }
+
     });
 
     $('.fc-left h2').after('<h3 id="calendar_identifier"></h3>');
     $('#calendar').after('<a href="#" id="deleteCalendar"></a>');
-    $('#userCalendarList').find('li:first a').trigger('click'); // triggers click of first calendar
 
 // display event Modal.. need to do click event this way b/c events are dynamically added
 $('body').on('click','.fc-event',function(e){
@@ -84,7 +84,9 @@ $('#addEventButton').click(function(e){
 
   e.preventDefault();
   var title = $('[name="title"]').val();
-  var desc  = $('[name="description"]').val();
+  var desc  = $.map($('[name="description"]').val().split("\n"), function(paragraph){
+    return '<p>'+paragraph+'</p>';
+  }).join('');
   var start = $('[name="start"]').val();
   var id    = $('.active :first-child')[0].id;
   console.log(id);
@@ -150,7 +152,7 @@ $('#addCalendarButton').click(function(e){
       $('[name="name"]').val('');
       $('[name="password"]').val('');
       $('#userCalendarList').append('<li class="active"><a href="#" class="calendar_options" identifier="'+ response.password+'"id="'+response.user_id+'">'+ name +'</a></li>');
-
+      $('#userCalendarList').find('.active a').trigger('click');
         // $('.calendar_options :last-child').click();
     }
   });
@@ -253,7 +255,9 @@ $('body').on('click','#deleteCalendar', function(e){
 
 $('#addCommentButton').click(function(e){
   e.preventDefault();
-  var comment  = $('[name="event_comment"]').val();
+  var comment  = $.map($('[name="event_comment"]').val().split("\n"), function(paragraph){
+    return '<p>'+paragraph+'</p>';
+  }).join('');
   var user_id  = $('[name="user_id"]').val();
   var current_date = new Date();
   var date = current_date.toLocaleTimeString('en-GB', { hour: "numeric", minute: "numeric"})+ ' ' + current_date.toLocaleDateString();
