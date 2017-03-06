@@ -241,6 +241,9 @@ div.fc-popover .fc-header{
   background-color: #4C688B;
   color: #f5f5f5;
 }
+#modalDescription p{
+  margin:0;
+}
 #modal #modalTitle{
   text-align: center;
 }
@@ -272,6 +275,10 @@ div.fc-popover .fc-header{
 .commentContent{
   border-top: 1px solid #555758;
   clear:both;
+  padding: 0px 10px;
+}
+.commentContent p{
+  margin: 0px;
 }
 /*event page*/
 #deleteEvent{
