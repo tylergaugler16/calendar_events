@@ -1,23 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="signup-bg">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <script src='/js/jquery-3.1.1.min.js'></script>
+  <title>Sign Up</title>
 </head>
 <body>
+  <div class="fullWidthContainer">
+    <div class="signupContainer">
+      <h1>Sign Up For EventPlanner!</h1>
 
-  <form class="" action="/signup" method="post">
-          <h3>Name</h3>
-          <input type="text" name="name" value="">
-          <h3>Username</h3>
-          <input type="text" name="username" value="">
-          <h3>Password</h3>
-          <input type="password" name="password" value="">
-          <br><br>
-          <input type="submit" name="" value="Sign Up">
-        </form>
+      <form class="" action="/signup" method="post" id="signupForm">
+              <h3>Name</h3>
+              <input type="text" name="name" value="" required>
+              <h3>Username</h3>
+              <input type="text" name="username" value="" required>
+              <h3>Password</h3>
+              <input type="password" name="password" value="" required>
+              <input type="submit" name="" value="Sign Up">
+            </form>
+      <div class="loginLink" style="margin-top:0px;font-size:12px;color:#4c688b">
+        <span>If you already have an account, log in </span><a href="/login" style="color: #4c688b;font-weight:600;" class="underline-hover">HERE</a>
+      </div>
+    </div>
+  </div>
 
 </body>
+
 </html>
+
+<script>
+  $('form').submit(function(e){
+    e.preventDefault();
+    atLeast6Characters = /^\n{6,}[^\s-]$/; //at leat 6 characters, no spaces
+    passwordRegex = /^\w{6,}\d+[^\s-]$/; //at least 6 characters, at least 1 number, no spaces
+    if(passwordRegex.test($('[name="password"]').val()) && usernameRegex.test($('[name="username"]').val())){
+          $(this).submit();
+    }
+  });
+
+</script>

@@ -1,7 +1,6 @@
 $(document).ready(function() {
 
 // creates calendar
-
     $('#calendar').fullCalendar({
       fixedWeekCount: false,
       header: {
@@ -12,16 +11,12 @@ $(document).ready(function() {
       views: {
         month: {
           eventLimit: 4
-        },
-        basicWeek: {
-
         }
-
       },
       dayClick: function(date, allDay, jsEvent, view) {
 
             $('[name="start"]').val(date.format());
-            var day;
+            $("html, body").animate({ scrollTop: $(document).height() }, 1000);
       },
       eventClick: function(calEvent, jsEvent, view) {
           console.log(calEvent);
@@ -112,7 +107,7 @@ $('#addEventButton').click(function(e){
         }], true);
         $('html, body').animate({
           scrollTop: $("#calendar").offset().top
-        }, 2000);
+        }, 1000);
         $('[name="title"]').val('');
         $('[name="start"]').val('');
         $('[name="description"]').val('');
@@ -121,23 +116,12 @@ $('#addEventButton').click(function(e){
 });
 
 // adds a calendar
-$('#addCalendarButton').click(function(e){
+$('#addCalendarForm').submit(function(e){
 
   e.preventDefault();
   var name     = $('[name="name"]').val();
   var user_id  = $('[name="user_id"]').val();
   var pass     = $('[name="password"]').val();
-  if(name === ''){
-    $('[name="name"]').focus(function(){
-      $(this).css({
-        'outline': 'none !important',
-        'border':'1px solid red' ,
-        'box-shadow': '0 0 10px'
-      });
-    });
-    $('[name="name"]').focus();
-    return false;
-  }
   $.ajax({
     url: '/calendar/add',
     type: 'POST',
@@ -153,7 +137,6 @@ $('#addCalendarButton').click(function(e){
       $('[name="password"]').val('');
       $('#userCalendarList').append('<li class="active"><a href="#" class="calendar_options" identifier="'+ response.password+'"id="'+response.user_id+'">'+ name +'</a></li>');
       $('#userCalendarList').find('.active a').trigger('click');
-        // $('.calendar_options :last-child').click();
     }
   });
 });
@@ -233,7 +216,7 @@ $('body').on('click', '.calendar_options', function(e){
 
 $('body').on('click','#deleteCalendar', function(e){
   e.preventDefault();
-  if(confirm("Are you sure you want to delete your calendar? This calendar will be deleted for all users associated with this calendar ")){
+  if(confirm("Are you sure you want to delete your calendar? This calendar will be deleted for all users associated with this calendar.")){
     calendar_id = $(this).attr('calendar_id');
     $.ajax({
       url: '/calendar/delete',
@@ -260,7 +243,7 @@ $('#addCommentButton').click(function(e){
   }).join('');
   var user_id  = $('[name="user_id"]').val();
   var current_date = new Date();
-  var date = current_date.toLocaleTimeString('en-GB', { hour: "numeric", minute: "numeric"})+ ' ' + current_date.toLocaleDateString();
+  var date = current_date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})+ '  ' + current_date.toLocaleDateString();
   var event_id = $('[name="eventId"]').val();
   var name = $('#userInfo h1').html();
   $.ajax({

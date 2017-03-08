@@ -10,7 +10,6 @@ var config = require('./oauth');
 
 var env = process.env.NODE_ENV || 'dev';
 
-
 var app = express();
 
 app.use(bodyParser.json());
@@ -43,18 +42,15 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function(user, done) {
-  console.log(user);
   done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-  console.log('deserializeUser');
   query(`select * from users where facebook_id='${id}'`, function(err, result){
     if(result.rowCount === 0){
       console.log("could not find user with given id");
     }
     else{
-      console.log(result.rows[0].username);
       done(null, result.rows[0]);
     }
   });
@@ -92,13 +88,15 @@ passport.use(new FacebookStrategy({
 
 
 function isLoggedIn(req, res, next) {
-  console.log(req.session.user);
-  console.log("yeeet");
     if (req.isAuthenticated() || req.session.user)
         return next();
 
     res.redirect("/login");
-    // res.sendStatus(401);
+}
+function isLoggedOut(req, res, next){
+  res.clearCookie("user");
+  req.logout();
+  return next();
 }
 
 app.get("/", isLoggedIn, function(req, res){
@@ -113,25 +111,11 @@ app.get("/", isLoggedIn, function(req, res){
       }
       else res.render('index', {user: user, calendar: []});
 
-
     });
-
 });
 
 
-app.post("/addEvent", function(req, res){
-    query(`insert into events(title, description, start_date, calendar_id) values('${req.body.title.replace("'","''")}', '${req.body.description.replace("'","''")}', '${req.body.start}', '${req.body.calendar_id}' ) returning id as last_id`, function(err, result){
-        if(err){
-          console.log(err);
-        }
-        else{
-          res.send({event: result.rows[0]});
-        }
-    });
-
-});
-
-app.get('/signup', function(req, res){
+app.get('/signup',isLoggedOut, function(req, res){
   res.render('signup');
 });
 app.post('/signup', function(req, res){
@@ -147,7 +131,6 @@ app.post('/signup', function(req, res){
     }
   });
 });
-
 
 app.get("/login", function(req, res){
   res.render('login');
@@ -168,7 +151,6 @@ app.post('/login', function(req, res){
 
   });
 });
-
 
 app.get('/logout', function (req, res){
   res.clearCookie("user");
@@ -221,28 +203,43 @@ console.log(req.query.name);
   // get all user_ids assocaited with calendar
 
 });
-app.get('/events/:start', function(req, res){
 
-  var start = req.params.start;
-  query(`select * from events where start_date='${req.params.start}' `,function(err, result){
-    if(err){
-      console.log("error finding the user");
-      res.send(err);
-    }
+app.post("/addEvent", function(req, res){
+    query(`insert into events(title, description, start_date, calendar_id) values('${req.body.title.replace("'","''")}', '${req.body.description.replace("'","''")}', '${req.body.start}', '${req.body.calendar_id}' ) returning id as last_id`, function(err, result){
+        if(err){
+          console.log(err);
+        }
+        else{
+          res.send({event: result.rows[0]});
+        }
+    });
+
+});
+app.post('/event/comment/add', function(req, res){
+  query(`insert into event_comments(user_id, comment, date, event_id, username) values(
+    '${req.body.user_id}', '${req.body.comment}', '${req.body.date}', '${req.body.event_id}', '${req.body.name}')`,
+    function(err, result){
+      if(err){
+        console.log(err);
+        res.sendStatus(404);
+      }
       else{
-        res.send({events: result.rows});
+        res.sendStatus(200);
+      }
+    });
+});
+
+app.get('/event/comments', function(req, res){
+  query(`select * from event_comments where event_id= '${req.query.event_id}'`, function(err, result){
+    if(err){
+      console.log(err);
+      res.sendStatus(404);
     }
-
+    else{
+      res.send({comments: result.rows});
+    }
   });
 });
-
-app.get('/events/delete/:id', function(req, res){
-  query(`delete from events where id=$1`,[req.params.id], function(err,result){
-    if(err) console.log(err);
-    res.redirect("/");
-  });
-});
-
 
 app.post('/calendar/add', function(req, res){
   password = randomstring.generate(10);
@@ -296,38 +293,6 @@ app.post('/calendar/delete', function(req, res){
         }
       });
     }
-  });
-});
-
-app.post('/event/comment/add', function(req, res){
-  query(`insert into event_comments(user_id, comment, date, event_id, username) values(
-    '${req.body.user_id}', '${req.body.comment}', '${req.body.date}', '${req.body.event_id}', '${req.body.name}')`,
-    function(err, result){
-      if(err){
-        console.log(err);
-        res.sendStatus(404);
-      }
-      else{
-        res.sendStatus(200);
-      }
-    });
-});
-
-app.get('/event/comments', function(req, res){
-  query(`select * from event_comments where event_id= '${req.query.event_id}'`, function(err, result){
-    if(err){
-      console.log(err);
-      res.sendStatus(404);
-    }
-    else{
-      res.send({comments: result.rows});
-    }
-  });
-});
-app.get("/event/:id", function(req, res){
-  console.log("yeet");
-  query('select * from events where id=$1',[req.params.id],function(err, result){
-      res.render('event',{event: result.rows[0]});
   });
 });
 
