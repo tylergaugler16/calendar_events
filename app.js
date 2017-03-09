@@ -69,6 +69,7 @@ passport.use(new FacebookStrategy({
     query(`select * from users where facebook_id='${profile.id}'`, function(err, result){
       var user = result;
       if( result.rowCount === 0 ){
+        console.log("heree");
         query(`insert into users(username, facebook_id, access_token) values('${profile.displayName}','${profile.id}','${accessToken}')`, function(err,result){
           user = result;
           // if(!err){ var user = result.rows[0];}
@@ -132,7 +133,8 @@ app.post('/signup', function(req, res){
   });
 });
 
-app.get("/login", function(req, res){
+app.get("/login", isLoggedOut, function(req, res){
+  if(req.user) console.log('user still logged on!');
   res.render('login');
 });
 app.post('/login', function(req, res){
