@@ -49,6 +49,7 @@ passport.deserializeUser(function(id, done) {
   query(`select * from users where facebook_id='${id}'`, function(err, result){
     if(result.rowCount === 0){
       console.log("could not find user with given id");
+      done(null, null)
     }
     else{
       done(null, result.rows[0]);
@@ -69,7 +70,6 @@ passport.use(new FacebookStrategy({
     query(`select * from users where facebook_id='${profile.id}'`, function(err, result){
       var user = result;
       if( result.rowCount === 0 ){
-        console.log("heree");
         query(`insert into users(username, facebook_id, access_token) values('${profile.displayName}','${profile.id}','${accessToken}')`, function(err,result){
           user = result;
           // if(!err){ var user = result.rows[0];}
@@ -174,8 +174,7 @@ app.get('/auth/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/login'}),
   function(req, res) {
     console.log("CALLBACK");
-    console.log(req.user.displayName);
-    // Successful authentication, redirect home.
+    console.log(req.user.name);
     res.redirect('/');
   });
 
