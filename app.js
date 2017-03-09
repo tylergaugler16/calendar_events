@@ -29,7 +29,7 @@ var callback_url = 'http://localhost:3000/auth/facebook/callback';
 var client_id = config.facebook.clientID;
 var client_secret = config.facebook.clientSecret;
 if(env == 'production'){
-  callback_url = 'https://weatherevent-calendar.herokuapp.com/auth/facebook/callback';
+  callback_url = 'https://planet-calendar.herokuapp.com/auth/facebook/callback';
   client_id = config.facebook_production.clientID;
   client_secret = config.facebook_production.clientSecret;
   secure = true;
