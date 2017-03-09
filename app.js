@@ -141,12 +141,15 @@ app.post('/login', function(req, res){
       console.log(err);
     }
     else if(result.rowCount === 0 ){
-      res.send({message: 'wrong email or password'});
+      res.redirect('/login');
     }
     else if(result.rowCount > 0 && (bcrypt.compareSync(req.body.password, result.rows[0].password) )){
       req.session.user = result.rows[0];
       res.redirect('/');
       console.log("found user");
+    }
+    else{
+      res.redirect('/login');
     }
 
   });

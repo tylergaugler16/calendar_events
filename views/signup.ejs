@@ -12,7 +12,7 @@
 <body>
   <div class="fullWidthContainer">
     <div class="signupContainer">
-      <h1>Sign Up For EventPlanner!</h1>
+      <h2>Sign Up For EventPlanner!</h2>
 
       <form class="" action="/signup" method="post" id="signupForm">
               <h3>Name</h3>
@@ -36,10 +36,11 @@
 <script>
   $('form').submit(function(e){
     e.preventDefault();
-    atLeast6Characters = /^\n{6,}[^\s-]$/; //at leat 6 characters, no spaces
-    passwordRegex = /^\w{6,}\d+[^\s-]$/; //at least 6 characters, at least 1 number, no spaces
-    if(passwordRegex.test($('[name="password"]').val()) && usernameRegex.test($('[name="username"]').val())){
-          $(this).submit();
+    atLeast6Characters = /^\w{6,}[^\s-]$/; //at leat 6 characters, no spaces
+    passwordRegex = /^\w{6,}\d*[^\s]+$/; //at least 6 characters, at least 1 number, no spaces
+    if(passwordRegex.test($('[name="password"]').val()) && atLeast6Characters.test($('[name="username"]').val()) ){
+      console.log("eyoo");
+          this.submit();
     }
   });
 

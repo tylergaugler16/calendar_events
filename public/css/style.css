@@ -324,19 +324,29 @@ div.fc-popover .fc-header{
 #loginFacebookLink{
   height: 30px;
   display: table;
-  width: 100%;
+  margin:0 auto;
+  padding: 2px 30px;
+  background-color: #3a5a94;
+
 }
 #loginFacebookLink span{
+  color:white;
   vertical-align: middle;
   display: table-cell;
   padding-right: 15px;
 }
 #facebook{
-  color:#3B5998;
+  background-color:#3B5998;
+  color: white;
+  /*color;#344e83;*/
 }
 #loginForm input, #signupForm input{
   width:100%;
 }
-#signupForm h3{
-  margin: 2px;
+.loginContainer h2, .signupContainer h2{
+  font-size: 1.8em;
+}
+#signupForm h3, #loginForm h3{
+  font-size: 1.2em;
+  margin: 0px;
 }
