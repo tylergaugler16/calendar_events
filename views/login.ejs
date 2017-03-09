@@ -12,17 +12,20 @@
 <body>
   <div class="fullWidthContainer">
     <div class="loginContainer">
-      <h1>Welcome to EventPlanner!</h1>
+      <h2>Welcome to EventPlanner!</h2>
       <div id="loginFacebookLink">
         <a href="/auth/facebook"><span>Login With Facebook   </span><i class="fa fa-facebook-official fa-2x" id="facebook" aria-hidden="true"></i></a>
       </div>
 
 
       <form action="/login" method="post" id="loginForm">
-        <input type="text" name="username" value="" placeholder="username">
-        <input type="password" name="password" value="" placeholder="password">
+        <input type="text" name="username" value="" placeholder="username" required>
+        <input type="password" name="password" value="" placeholder="password" required>
         <input type="submit" name="" value="Log in">
       </form>
+      <div class="signupLink" style="margin-top:0px;font-size:12px;color:#4c688b">
+        <span>Don't have an account? Sign up </span><a href="/signup" style="color: #4c688b;font-weight:600;" class="underline-hover">HERE</a>
+      </div>
 
     </div>
 

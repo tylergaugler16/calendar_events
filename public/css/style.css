@@ -15,7 +15,7 @@ html{
   -o-background-size: cover;
   background-size: cover;
 }
-.login-bg {
+.login-bg, .signup-bg {
   background: url(/images/login.jpeg) no-repeat center center fixed;
   background-color: transparent;
 }
@@ -27,15 +27,22 @@ a{
 a:visited{
   color:#555758;
 }
-
+.underline-hover:hover{
+  text-decoration: underline;
+}
 
 input[type="submit"]{
   background-color: #4C688B;
   color: white;
   border-radius: 7px;
+  border-color: transparent;
 }
 input[name="name"]{
   outline:none;
+}
+form input{
+  display: block;
+  margin: 10px 0;
 }
 
 #userInfo{
@@ -172,17 +179,14 @@ input[name="name"]{
 .addEvent{
   margin: 25px;
 }
-form input{
-  display: block;
-  margin: 10px 0;
-}
+
 
 thead td{
   background-color: #4C688B;
 }
 tbody td{
-  /*background-color: #748BA7;*/
   background-color: #D6DADC;
+  cursor: pointer;
 }
 .fc-unthemed td{
   border-color: #748BA7;
@@ -261,7 +265,6 @@ div.fc-popover .fc-header{
   margin: 20px auto;
 }
 .commentAuthor, .commentDate{
-  /*width:115px;*/
   padding: 0px 5px;
   display: inline-block;
   font-size: 0.8em;
@@ -303,9 +306,9 @@ div.fc-popover .fc-header{
     margin-top: 30px;
 }
 
-/*login page */
+/*login page  and signup page*/
 
-.loginContainer{
+.loginContainer, .signupContainer{
   position: fixed;
   top: 40%;
   left: 50%;
@@ -321,16 +324,29 @@ div.fc-popover .fc-header{
 #loginFacebookLink{
   height: 30px;
   display: table;
-  width: 100%;
+  margin:0 auto;
+  padding: 2px 30px;
+  background-color: #3a5a94;
+
 }
 #loginFacebookLink span{
+  color:white;
   vertical-align: middle;
   display: table-cell;
   padding-right: 15px;
 }
 #facebook{
-  color:#3B5998;
+  background-color:#3B5998;
+  color: white;
+  /*color;#344e83;*/
 }
-#loginForm input{
+#loginForm input, #signupForm input{
   width:100%;
+}
+.loginContainer h2, .signupContainer h2{
+  font-size: 1.8em;
+}
+#signupForm h3, #loginForm h3{
+  font-size: 1.2em;
+  margin: 0px;
 }

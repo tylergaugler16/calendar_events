@@ -5,15 +5,10 @@ var bcrypt      = require('bcrypt');
 var session = require('express-session');
 var passport    = require('passport');
 var randomstring = require('randomstring');
-
 var FacebookStrategy = require('passport-facebook').Strategy;
 var config = require('./oauth');
 
 var env = process.env.NODE_ENV || 'dev';
-
-// var connectionString = process.env.DATABASE_URL || 'postgres://' + process.env.POSTGRES_USER + ':' + process.env.POSTGRES_PASSWORD + '@localhost/calendar' ;
-
-
 
 var app = express();
 
@@ -56,7 +51,6 @@ passport.deserializeUser(function(id, done) {
       console.log("could not find user with given id");
     }
     else{
-      console.log(result.rows[0].username);
       done(null, result.rows[0]);
     }
   });
@@ -92,83 +86,79 @@ passport.use(new FacebookStrategy({
   }
 ));
 
+
 function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated())
+    if (req.isAuthenticated() || req.session.user)
         return next();
 
     res.redirect("/login");
-    // res.sendStatus(401);
 }
-// example how to use isLoggedIn
-// app.get("/", isLoggedIn function(req, res){
-//   console.log(req.user);
-//
-//   res.render('index', {user: req.user});
-// });
-
+function isLoggedOut(req, res, next){
+  res.clearCookie("user");
+  req.logout();
+  return next();
+}
 
 app.get("/", isLoggedIn, function(req, res){
   var user_calendars = {};
   calendars = [];
   user_calendars.calendars = calendars;
-  query(`select * from calendars where user_id=${req.user.id}`, function(err, result){
+  user = req.user || req.session.user;
+  query(`select * from calendars where user_id=${user.id}`, function(err, result){
     if(result.rowCount > 0){
-      res.render('index', {user: req.user, calendars: result.rows});
-      // for(var i=0;i<result.rows.length;i++){
-      //   user_calendars.calendars[i] = {
-      //     name: result.rows[i].name,
-      //     id: result.rows[i].id
-      //     };
-      //   }
+      res.render('index', {user: user, calendars: result.rows});
 
       }
-      else res.render('index', {user: req.user, calendar: []});
-
+      else res.render('index', {user: user, calendar: []});
 
     });
-
 });
 
 
-app.post("/addEvent", function(req, res){
-    query(`insert into events(title, description, start_date, calendar_id) values('${req.body.title.replace("'","''")}', '${req.body.description.replace("'","''")}', '${req.body.start}', '${req.body.calendar_id}' ) returning id as last_id`, function(err, result){
-        if(err){
-          console.log(err);
-        }
-        else{
-          res.send({event: result.rows[0]});
-        }
-    });
-
+app.get('/signup',isLoggedOut, function(req, res){
+  res.render('signup');
 });
-
-
+app.post('/signup', function(req, res){
+  var salt = bcrypt.genSaltSync(10);
+  var generatedPass = bcrypt.hashSync(req.body.password, salt);
+  query(`insert into users(name, password, username) values('${req.body.name}', '${generatedPass}','${req.body.username}') returning *`, function(err, result){
+    if(err){
+      console.log(err);
+      res.redirect('/signup', {flash_message: err});
+    }
+    else{
+      res.redirect('/login');
+    }
+  });
+});
 
 app.get("/login", function(req, res){
   res.render('login');
 });
-
-app.post("/login", function(req, res){
-  bcrypt.hash(req.body.password, 10, function(){
+app.post('/login', function(req, res){
+  query(`select * from users where username ='${req.body.username}'`, function(err, result){
     if(err){
+      console.log(err);
+    }
+    else if(result.rowCount === 0 ){
       res.redirect('/login');
     }
-    query(`select * from users where username =$1 and password =$2`,['${req.body.username}', hash], function(err, result){
-      if(err){
-        res.send(err);
-      }
-      else{
-        res.send("found user!");
-      }
-    });
+    else if(result.rowCount > 0 && (bcrypt.compareSync(req.body.password, result.rows[0].password) )){
+      req.session.user = result.rows[0];
+      res.redirect('/');
+      console.log("found user");
+    }
+    else{
+      res.redirect('/login');
+    }
 
   });
-
 });
+
 app.get('/logout', function (req, res){
   res.clearCookie("user");
   req.logout();
-  res.redirect('/');
+  res.redirect('/login');
 });
 
 app.get('/auth/facebook', passport.authenticate('facebook'),function(req, res){
@@ -216,28 +206,43 @@ console.log(req.query.name);
   // get all user_ids assocaited with calendar
 
 });
-app.get('/events/:start', function(req, res){
 
-  var start = req.params.start;
-  query(`select * from events where start_date='${req.params.start}' `,function(err, result){
-    if(err){
-      console.log("error finding the user");
-      res.send(err);
-    }
+app.post("/addEvent", function(req, res){
+    query(`insert into events(title, description, start_date, calendar_id) values('${req.body.title.replace("'","''")}', '${req.body.description.replace("'","''")}', '${req.body.start}', '${req.body.calendar_id}' ) returning id as last_id`, function(err, result){
+        if(err){
+          console.log(err);
+        }
+        else{
+          res.send({event: result.rows[0]});
+        }
+    });
+
+});
+app.post('/event/comment/add', function(req, res){
+  query(`insert into event_comments(user_id, comment, date, event_id, username) values(
+    '${req.body.user_id}', '${req.body.comment}', '${req.body.date}', '${req.body.event_id}', '${req.body.name}')`,
+    function(err, result){
+      if(err){
+        console.log(err);
+        res.sendStatus(404);
+      }
       else{
-        res.send({events: result.rows});
+        res.sendStatus(200);
+      }
+    });
+});
+
+app.get('/event/comments', function(req, res){
+  query(`select * from event_comments where event_id= '${req.query.event_id}'`, function(err, result){
+    if(err){
+      console.log(err);
+      res.sendStatus(404);
     }
-
+    else{
+      res.send({comments: result.rows});
+    }
   });
 });
-
-app.get('/events/delete/:id', function(req, res){
-  query(`delete from events where id=$1`,[req.params.id], function(err,result){
-    if(err) console.log(err);
-    res.redirect("/");
-  });
-});
-
 
 app.post('/calendar/add', function(req, res){
   password = randomstring.generate(10);
@@ -291,38 +296,6 @@ app.post('/calendar/delete', function(req, res){
         }
       });
     }
-  });
-});
-
-app.post('/event/comment/add', function(req, res){
-  query(`insert into event_comments(user_id, comment, date, event_id, username) values(
-    '${req.body.user_id}', '${req.body.comment}', '${req.body.date}', '${req.body.event_id}', '${req.body.username}')`,
-    function(err, result){
-      if(err){
-        console.log(err);
-        res.sendStatus(404);
-      }
-      else{
-        res.sendStatus(200);
-      }
-    });
-});
-
-app.get('/event/comments', function(req, res){
-  query(`select * from event_comments where event_id= '${req.query.event_id}'`, function(err, result){
-    if(err){
-      console.log(err);
-      res.sendStatus(404);
-    }
-    else{
-      res.send({comments: result.rows});
-    }
-  });
-});
-app.get("/event/:id", function(req, res){
-  console.log("yeet");
-  query('select * from events where id=$1',[req.params.id],function(err, result){
-      res.render('event',{event: result.rows[0]});
   });
 });
 

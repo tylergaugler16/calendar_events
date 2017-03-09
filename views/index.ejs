@@ -12,13 +12,13 @@
   <script src='/js/moment.min.js'></script>
   <script src='/fullcalendar-3.1.0/fullcalendar.js'></script>
 
-  <title><%= user.username %></title>
+  <title><%= user.name %></title>
 </head>
 <body>
 
 <div class="userContainer">
   <div id="userInfo">
-    <h1><%= user.username %></h1>
+    <h1><%= user.name %></h1>
     <a href="/logout">Logout</a>
   </div>
 
@@ -38,9 +38,9 @@
     </div>
     <div id="addCalendar">
       <h2>Add Calendar</h2>
-      <form action="" method="post">
+      <form action="/" method="post" id ="addCalendarForm">
         <h3>Name</h3>
-        <input type="text" name="name" required>
+        <input type="text" name="name" val='' required>
         <input type="hidden" name="user_id" value="<%= user.id %>">
         <input type="submit" value="Create Calendar" id="addCalendarButton">
       </form>

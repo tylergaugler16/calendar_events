@@ -1,7 +1,6 @@
 $(document).ready(function() {
 
 // creates calendar
-
     $('#calendar').fullCalendar({
       fixedWeekCount: false,
       header: {
@@ -12,16 +11,12 @@ $(document).ready(function() {
       views: {
         month: {
           eventLimit: 4
-        },
-        basicWeek: {
-
         }
-
       },
       dayClick: function(date, allDay, jsEvent, view) {
 
             $('[name="start"]').val(date.format());
-            var day;
+            $("html, body").animate({ scrollTop: $(document).height() }, 1000);
       },
       eventClick: function(calEvent, jsEvent, view) {
           console.log(calEvent);
@@ -37,7 +32,7 @@ $(document).ready(function() {
             },
             success: function(result){
               for(var i = result.comments.length-1;i >= 0;i--){
-                $('<div class="comment"><div class="commentHeader"><div class="commentAuthor"><span>'+result.comments[i].username+'</span></div><div class="commentDate"><span>'+result.comments[i].date+'</span></div></div><div class="commentContent">'+result.comments[i].comment+'</div></div>').insertBefore('#addComment');
+                $('<div class="comment"><div class="commentHeader"><div class="commentAuthor"><span>'+result.comments[i].name+'</span></div><div class="commentDate"><span>'+result.comments[i].date+'</span></div></div><div class="commentContent">'+result.comments[i].comment+'</div></div>').insertBefore('#addComment');
               }
               $('#modalDescription').css('display','block');
               $('#overlay, #modal, #eventComments').css('display','initial');
@@ -112,7 +107,7 @@ $('#addEventButton').click(function(e){
         }], true);
         $('html, body').animate({
           scrollTop: $("#calendar").offset().top
-        }, 2000);
+        }, 1000);
         $('[name="title"]').val('');
         $('[name="start"]').val('');
         $('[name="description"]').val('');
@@ -121,23 +116,12 @@ $('#addEventButton').click(function(e){
 });
 
 // adds a calendar
-$('#addCalendarButton').click(function(e){
+$('#addCalendarForm').submit(function(e){
 
   e.preventDefault();
   var name     = $('[name="name"]').val();
   var user_id  = $('[name="user_id"]').val();
   var pass     = $('[name="password"]').val();
-  if(name === ''){
-    $('[name="name"]').focus(function(){
-      $(this).css({
-        'outline': 'none !important',
-        'border':'1px solid red' ,
-        'box-shadow': '0 0 10px'
-      });
-    });
-    $('[name="name"]').focus();
-    return false;
-  }
   $.ajax({
     url: '/calendar/add',
     type: 'POST',
@@ -153,7 +137,6 @@ $('#addCalendarButton').click(function(e){
       $('[name="password"]').val('');
       $('#userCalendarList').append('<li class="active"><a href="#" class="calendar_options" identifier="'+ response.password+'"id="'+response.user_id+'">'+ name +'</a></li>');
       $('#userCalendarList').find('.active a').trigger('click');
-        // $('.calendar_options :last-child').click();
     }
   });
 });
@@ -193,7 +176,7 @@ $('body').on('click', '.calendar_options', function(e){
           }
           $('#calendarUsers ul').empty();
           for(var r =0;r<response.users.length;r++){
-            $('#calendarUsers ul').append('<li>'+response.users[r].username+'</li>');
+            $('#calendarUsers ul').append('<li>'+response.users[r].name+'</li>');
           }
           $('#calendar_identifier, #deleteCalendar').html('');
           $('#calendar_identifier').html('Invite Code: '+pass);
@@ -223,7 +206,7 @@ $('body').on('click', '.calendar_options', function(e){
         $('ul').find('.active').removeClass('active');
         $('[name="name"]').val('');
         $('[name="password"]').val('');
-        $('#userCalendarList').append('<li class="active"><a href="#" class="calendar_options" identifier="'+ pass+'"id="'+user_id+'">'+ response.name +'</a></li>');
+        $('#userCalendarList').append('<li class="active"><a href="#" class="calendar_options" identifier="'+ pass+'"id="'+response.user_id+'">'+ response.name +'</a></li>');
         $('#closeModal').click();
         $('#userCalendarList').find('.active a').trigger('click');
       }
@@ -233,7 +216,7 @@ $('body').on('click', '.calendar_options', function(e){
 
 $('body').on('click','#deleteCalendar', function(e){
   e.preventDefault();
-  if(confirm("Are you sure you want to delete your calendar? This calendar will be deleted for all users associated with this calendar ")){
+  if(confirm("Are you sure you want to delete your calendar? This calendar will be deleted for all users associated with this calendar.")){
     calendar_id = $(this).attr('calendar_id');
     $.ajax({
       url: '/calendar/delete',
@@ -260,9 +243,9 @@ $('#addCommentButton').click(function(e){
   }).join('');
   var user_id  = $('[name="user_id"]').val();
   var current_date = new Date();
-  var date = current_date.toLocaleTimeString('en-GB', { hour: "numeric", minute: "numeric"})+ ' ' + current_date.toLocaleDateString();
+  var date = current_date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})+ '  ' + current_date.toLocaleDateString();
   var event_id = $('[name="eventId"]').val();
-  var username = $('#userInfo h1').html();
+  var name = $('#userInfo h1').html();
   $.ajax({
     url: '/event/comment/add',
     type: 'post',
@@ -271,11 +254,11 @@ $('#addCommentButton').click(function(e){
       user_id: user_id,
       date: date,
       event_id : event_id,
-      username: username,
+      name: name,
     },
     success: function(response){
       var $first = $('#eventComments div').first();
-      $('<div class="comment"><div class="commentHeader"><div class="commentAuthor"><span>'+username+'</span></div><div class="commentDate"><span>'+date+'</span></div></div><div class="commentContent">'+comment+'</div></div>').insertBefore($first);
+      $('<div class="comment"><div class="commentHeader"><div class="commentAuthor"><span>'+name+'</span></div><div class="commentDate"><span>'+date+'</span></div></div><div class="commentContent">'+comment+'</div></div>').insertBefore($first);
       $('[name="event_comment"]').val('');
       console.log("added comment");
     }
