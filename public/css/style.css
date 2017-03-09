@@ -62,6 +62,26 @@ form input{
   margin-left:10px;
   color: white;
 }
+#logo{
+  display: inline-block;
+  position: absolute;
+  top:0;
+  left: 47%;
+}
+#logo img{
+  height:45px;
+}
+#logoText{
+  display: inline-block;
+  position: absolute;
+  top:0;
+  left: 51%;
+}
+#logoText h2{
+  color:white;
+  margin: 6px;
+  /*display: inline-block;*/
+}
 #userInfo a{
   float:right;
   margin-top: 5px;
