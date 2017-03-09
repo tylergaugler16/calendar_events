@@ -221,7 +221,7 @@ app.post("/addEvent", function(req, res){
 });
 app.post('/event/comment/add', function(req, res){
   query(`insert into event_comments(user_id, comment, date, event_id, username) values(
-    '${req.body.user_id}', '${req.body.comment}', '${req.body.date}', '${req.body.event_id}', '${req.body.name}')`,
+    '${req.body.user_id}', '${req.body.comment.replace("'","''")}', '${req.body.date}', '${req.body.event_id}', '${req.body.name}')`,
     function(err, result){
       if(err){
         console.log(err);
