@@ -70,7 +70,7 @@ passport.use(new FacebookStrategy({
     query(`select * from users where facebook_id='${profile.id}'`, function(err, result){
       var user = result;
       if( result.rowCount === 0 ){
-        query(`insert into users(username, facebook_id, access_token) values('${profile.displayName}','${profile.id}','${accessToken}')`, function(err,result){
+        query(`insert into users(name, facebook_id, access_token) values('${profile.displayName}','${profile.id}','${accessToken}')`, function(err,result){
           user = result;
           // if(!err){ var user = result.rows[0];}
           // else{console.log(err);}
